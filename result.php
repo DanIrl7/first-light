@@ -2,6 +2,7 @@
 require __DIR__ . '/includes/bootstrap.php';
 require __DIR__ . '/includes/day.php';
 require __DIR__ . '/includes/music.php';
+require __DIR__ . '/includes/youtube.php';
 
 if (empty($_SESSION['profile'])) {
     set_flash('Enter your details first.');
@@ -24,7 +25,10 @@ $song = $day['song'];
 $searchUrl = $song !== null
     ? 'https://www.youtube.com/results?search_query=' . rawurlencode($song['song'] . ' ' . $song['artist'])
     : null;
-$videoId = $song !== null ? music_video_id($song['song'], $song['artist']) : null;
+// A manual entry in data/videos.csv wins; otherwise look for an embeddable video through the API.
+$videoId = $song !== null
+    ? (music_video_id($song['song'], $song['artist']) ?? youtube_embeddable_id($song['song'], $song['artist']))
+    : null;
 ?>
 <!doctype html>
 <html lang="en">
