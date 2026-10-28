@@ -60,12 +60,26 @@
                         startPlayback();
                     }
                 },
-                onError: () => {
+                onError: (event) => {
                     button.hidden = true;
-                    setStatus('This video can\'t be played here. Try searching for the song on YouTube instead.');
+                    console.warn('YouTube player error', event.data);
+                    setStatus(errorMessage(event.data));
                 },
             },
         });
+    }
+
+    // Codes from YouTube's IFrame API: https://developers.google.com/youtube/iframe_api_reference#Events
+    function errorMessage(code) {
+        const reasons = {
+            2: 'The video ID is invalid.',
+            5: 'The browser couldn\'t play this video.',
+            100: 'This video was removed or is private.',
+            101: 'The video owner doesn\'t allow it to be played on other sites.',
+            150: 'The video owner doesn\'t allow it to be played on other sites.',
+        };
+
+        return (reasons[code] || 'This video can\'t be played here.') + ' You can search for the song on YouTube instead.';
     }
 
     function startPlayback() {
