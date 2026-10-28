@@ -1,0 +1,123 @@
+/* Birthday calendar. Colours come from the :root tokens in style.css. */
+
+/* With JavaScript, the calendar replaces the browser's date input. Without it, the input stays. */
+.js .native-date {
+    display: none;
+}
+
+.date-picker {
+    position: relative;
+}
+
+.date-picker-toggle {
+    width: 100%;
+    text-align: left;
+    font: inherit;
+    padding: 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text);
+    cursor: pointer;
+}
+
+.date-picker-panel {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.date-picker-panel[hidden] {
+    display: none;
+}
+
+.date-picker-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.date-picker-nav {
+    font: inherit;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text);
+    cursor: pointer;
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+.date-picker-nav:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.date-picker-select {
+    font: inherit;
+    padding: 6px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text);
+    min-width: 0;
+}
+
+.date-picker-weekdays,
+.date-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    text-align: center;
+}
+
+.date-picker-weekdays span {
+    font-size: 0.75rem;
+    color: var(--muted);
+    padding: 4px 0;
+}
+
+.date-picker-day {
+    font: inherit;
+    aspect-ratio: 1;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    padding: 0;
+}
+
+.date-picker-day:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.date-picker-day.today {
+    outline: 1px solid var(--accent);
+    outline-offset: -1px;
+}
+
+.date-picker-day.selected {
+    background: var(--accent);
+    color: #ffffff;
+}
+
+.date-picker-day:focus-visible,
+.date-picker-toggle:focus-visible,
+.date-picker-nav:focus-visible,
+.date-picker-select:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+}

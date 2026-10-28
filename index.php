@@ -11,6 +11,8 @@ $today = (new DateTimeImmutable('today'))->format('Y-m-d');
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Born Here</title>
     <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/calendar.css">
+    <script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
     <main>
@@ -29,7 +31,7 @@ $today = (new DateTimeImmutable('today'))->format('Y-m-d');
             </label>
 
             <label>Birthday
-                <input type="date" name="birthday" min="1940-01-01" max="<?= e($today) ?>" required>
+                <input type="date" name="birthday" id="birthday-native" class="native-date" min="1940-01-01" max="<?= e($today) ?>" required>
             </label>
             <small class="hint">We can go back as far as 1 January 1940.</small>
 
@@ -45,5 +47,7 @@ $today = (new DateTimeImmutable('today'))->format('Y-m-d');
             <button type="submit">Continue</button>
         </form>
     </main>
+
+    <script src="assets/calendar.js"></script>
 </body>
 </html>
