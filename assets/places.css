@@ -1,0 +1,35 @@
+/* Birth place search. Colours come from the :root tokens in style.css. */
+
+/* With JavaScript, the search box replaces the typed city and country fields. Without it, they stay. */
+.js .fallback-place {
+    display: none;
+}
+
+.place-results {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--card);
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.place-results[hidden] {
+    display: none;
+}
+
+.place-option {
+    padding: 8px 10px;
+    cursor: pointer;
+}
+
+.place-option[aria-selected="true"],
+.place-option:hover {
+    background: var(--bg);
+    color: var(--accent);
+}
+
+.place-message {
+    padding: 8px 10px;
+    color: var(--muted);
+    font-size: 0.9rem;
+}

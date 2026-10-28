@@ -10,8 +10,6 @@ verify_csrf();
 
 $name = trim((string) ($_POST['name'] ?? ''));
 $birthday = trim((string) ($_POST['birthday'] ?? ''));
-$city = trim((string) ($_POST['city'] ?? ''));
-$country = trim((string) ($_POST['country'] ?? ''));
 
 if ($name === '' || mb_strlen($name) > 80) {
     set_flash('Please enter a name (up to 80 characters).');
@@ -27,16 +25,29 @@ if ($date === false || $date->format('Y-m-d') !== $birthday || $date < $earliest
     redirect('index.php');
 }
 
-if ($city === '' || $country === '') {
-    set_flash('Please enter both a city and a country.');
-    redirect('index.php');
-}
+// A place chosen from the suggestion list is used as-is. Otherwise, look up the typed city and country.
+if (($_POST['place_latitude'] ?? '') !== '') {
+    $place = place_from_selection($_POST);
 
-$place = geocode_city($city, $country);
+    if ($place === null) {
+        set_flash('That place couldn\'t be read. Please choose it from the list again.');
+        redirect('index.php');
+    }
+} else {
+    $city = trim((string) ($_POST['city'] ?? ''));
+    $country = trim((string) ($_POST['country'] ?? ''));
 
-if ($place === null) {
-    set_flash('We could not find "' . $city . '" in "' . $country . '". Check the spelling, or try a larger nearby city.');
-    redirect('index.php');
+    if ($city === '' || $country === '') {
+        set_flash('Please choose a birth place from the list, or enter a city and a country.');
+        redirect('index.php');
+    }
+
+    $place = geocode_city($city, $country);
+
+    if ($place === null) {
+        set_flash('We could not find "' . $city . '" in "' . $country . '". Check the spelling, or try a larger nearby city.');
+        redirect('index.php');
+    }
 }
 
 // Keep only what the next steps need. Name and birthday stay in the session, never in the URL.
