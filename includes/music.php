@@ -12,9 +12,10 @@ function music_video_id(string $song, string $artist): ?string
         $file = __DIR__ . '/../data/videos.csv';
 
         if (is_readable($file) && ($handle = fopen($file, 'r')) !== false) {
-            fgetcsv($handle); // skip the header row
+            // The escape argument is passed explicitly, since PHP 8.4 warns when it's left out.
+            fgetcsv($handle, null, ',', '"', ''); // skip the header row
 
-            while (($row = fgetcsv($handle)) !== false) {
+            while (($row = fgetcsv($handle, null, ',', '"', '')) !== false) {
                 if (count($row) < 3) {
                     continue;
                 }
