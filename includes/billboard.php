@@ -1,0 +1,142 @@
+<?php
+declare(strict_types=1);
+
+// The US Billboard Hot 100 number one that was in effect on a date.
+// The chart has weekly data from 1958 onward; earlier dates return null.
+function billboard_number_one_on(DateTimeImmutable $date): ?array
+{
+    $year = (int) $date->format('Y');
+
+    if ($year < 1958) {
+        return null;
+    }
+
+    $target = $date->format('Y-m-d');
+    $best = null;
+
+    foreach (billboard_year_rows($year) as $row) {
+        if ($row['date'] <= $target) {
+            $best = $row;
+        }
+    }
+
+    // The first chart of a year often comes after 1 January, so fall back to the last chart of the previous year.
+    if ($best === null && $year - 1 >= 1958) {
+        $previous = billboard_year_rows($year - 1);
+        $best = $previous === [] ? null : end($previous);
+    }
+
+    if ($best === null) {
+        return null;
+    }
+
+    return [
+        'song' => $best['song'],
+        'artist' => $best['artist'],
+        'chart_date' => $best['date'],
+        'chart' => 'Billboard Hot 100 (US)',
+    ];
+}
+
+// All weekly number ones for a year, in date order: [['date' => 'Y-m-d', 'song' => ..., 'artist' => ...], ...]
+function billboard_year_rows(int $year): array
+{
+    $rows = cache_remember("billboard:$year", app_config()['cache_ttl']['chart'], function () use ($year) {
+        $data = http_get_json('https://en.wikipedia.org/w/api.php?' . http_build_query([
+            'action' => 'parse',
+            'page' => "List of Billboard Hot 100 number ones of $year",
+            'prop' => 'text',
+            'format' => 'json',
+            'formatversion' => 2,
+        ]));
+
+        $html = $data['parse']['text'] ?? null;
+
+        if (!is_string($html)) {
+            return null;
+        }
+
+        // An empty result is treated as a failure, so it isn't cached.
+        $rows = billboard_parse_rows($html, $year);
+
+        return $rows === [] ? null : $rows;
+    });
+
+    return is_array($rows) ? $rows : [];
+}
+
+// Read the weekly table from the rendered page. Song and artist cells use rowspan,
+// so values carry down into the rows they span.
+function billboard_parse_rows(string $html, int $year): array
+{
+    $dom = new DOMDocument();
+    libxml_use_internal_errors(true);
+    $dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
+    libxml_clear_errors();
+
+    $xpath = new DOMXPath($dom);
+    $table = null;
+
+    foreach ($xpath->query("//table[contains(concat(' ', normalize-space(@class), ' '), ' wikitable ')]") as $candidate) {
+        if (str_contains($candidate->textContent, 'Issue date')) {
+            $table = $candidate;
+            break;
+        }
+    }
+
+    if ($table === null) {
+        return [];
+    }
+
+    $carry = [];
+    $rows = [];
+
+    foreach ($xpath->query('.//tr', $table) as $tr) {
+        $cells = [];
+        $col = 0;
+
+        foreach ($tr->childNodes as $cell) {
+            // Some years mark the row number as <th>, so read both cell types.
+            // Header rows parse to no date and are skipped below.
+            if (!in_array($cell->nodeName, ['td', 'th'], true)) {
+                continue;
+            }
+
+            // Fill columns still covered by a rowspan from an earlier row.
+            while (isset($carry[$col]) && $carry[$col]['left'] > 0) {
+                $cells[$col] = $carry[$col]['text'];
+                $carry[$col]['left']--;
+                $col++;
+            }
+
+            $text = trim(preg_replace('/\s+/', ' ', preg_replace('/\[\d+\]/', '', $cell->textContent)));
+            $span = (int) ($cell->attributes?->getNamedItem('rowspan')?->nodeValue ?? 1);
+            $cells[$col] = $text;
+
+            if ($span > 1) {
+                $carry[$col] = ['text' => $text, 'left' => $span - 1];
+            }
+
+            $col++;
+        }
+
+        // Columns: 0 = No., 1 = issue date, 2 = song, 3 = artist.
+        if (!isset($cells[1], $cells[2], $cells[3])) {
+            continue;
+        }
+
+        $date = DateTimeImmutable::createFromFormat('F j Y', trim($cells[1]) . ' ' . $year);
+
+        if ($date === false) {
+            continue;
+        }
+
+        $rows[] = [
+            'date' => $date->format('Y-m-d'),
+            'song' => trim($cells[2], " \t\"“”"),
+            'artist' => $cells[3],
+        ];
+    }
+
+    return $rows;
+}
