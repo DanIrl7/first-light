@@ -1,0 +1,167 @@
+/* Day page. Colours come from the :root tokens in style.css. */
+
+.day {
+    max-width: 680px;
+}
+
+.panel {
+    padding: 48px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.panel h2 {
+    margin: 0 0 8px;
+    font-size: 1.5rem;
+}
+
+.panel-intro h1 {
+    font-size: 2rem;
+    line-height: 1.2;
+    margin: 4px 0 8px;
+}
+
+.eyebrow {
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.8rem;
+    margin: 0;
+}
+
+.meta,
+.note {
+    color: var(--muted);
+    font-size: 0.95rem;
+}
+
+.note {
+    margin-top: 0;
+}
+
+.hero {
+    width: 100%;
+    border-radius: 8px;
+    margin: 16px 0;
+    display: block;
+}
+
+.weather {
+    margin-top: 12px;
+}
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px 0;
+    display: grid;
+    gap: 8px;
+}
+
+.card img {
+    width: 100%;
+    border-radius: 6px;
+    display: block;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+}
+
+.event-year {
+    font-weight: 700;
+    color: var(--accent);
+    margin: 0;
+}
+
+.event p,
+.person p {
+    margin: 0;
+}
+
+.person h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.panel-music .song-title {
+    font-size: 1.4rem;
+    margin: 8px 0 4px;
+}
+
+.panel-certificate {
+    border: 2px solid var(--accent);
+    border-radius: 8px;
+    padding: 24px;
+    margin: 32px 0;
+}
+
+.certificate-text {
+    font-size: 1.1rem;
+}
+
+.print-button {
+    font: inherit;
+    padding: 8px 14px;
+    border: 0;
+    border-radius: 6px;
+    background: var(--accent);
+    color: #ffffff;
+    cursor: pointer;
+}
+
+/* Clock pinned to the top-right corner while scrolling. */
+.clock {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 10;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 10px;
+    display: grid;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.clock-time {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.clock-date {
+    font-size: 0.75rem;
+    color: var(--muted);
+}
+
+/* Sections fade in as they scroll into view. Only applies when JavaScript runs. */
+.js .panel {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.js .panel.in {
+    opacity: 1;
+    transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .js .panel {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}
+
+@media print {
+    .clock,
+    .print-button,
+    .admin-link {
+        display: none;
+    }
+
+    .panel {
+        break-inside: avoid;
+    }
+}
