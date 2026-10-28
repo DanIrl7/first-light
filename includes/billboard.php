@@ -42,24 +42,36 @@ function billboard_number_one_on(DateTimeImmutable $date): ?array
 function billboard_year_rows(int $year): array
 {
     $rows = cache_remember("billboard:$year", app_config()['cache_ttl']['chart'], function () use ($year) {
-        $data = http_get_json('https://en.wikipedia.org/w/api.php?' . http_build_query([
-            'action' => 'parse',
-            'page' => "List of Billboard Hot 100 number ones of $year",
-            'prop' => 'text',
-            'format' => 'json',
-            'formatversion' => 2,
-        ]));
+        // Most years have one page per year. 1958 is only in a combined page, so try that name next.
+        $titles = [
+            "List of Billboard Hot 100 number ones of $year",
+            "List of Billboard number-one singles of $year",
+        ];
 
-        $html = $data['parse']['text'] ?? null;
+        foreach ($titles as $title) {
+            $data = http_get_json('https://en.wikipedia.org/w/api.php?' . http_build_query([
+                'action' => 'parse',
+                'page' => $title,
+                'prop' => 'text',
+                'format' => 'json',
+                'formatversion' => 2,
+            ]));
 
-        if (!is_string($html)) {
-            return null;
+            $html = $data['parse']['text'] ?? null;
+
+            if (!is_string($html)) {
+                continue;
+            }
+
+            $rows = billboard_parse_rows($html, $year);
+
+            if ($rows !== []) {
+                return $rows;
+            }
         }
 
-        // An empty result is treated as a failure, so it isn't cached.
-        $rows = billboard_parse_rows($html, $year);
-
-        return $rows === [] ? null : $rows;
+        // Nothing found under any title. Null isn't cached, so this is retried later.
+        return null;
     });
 
     return is_array($rows) ? $rows : [];
@@ -77,8 +89,14 @@ function billboard_parse_rows(string $html, int $year): array
     $xpath = new DOMXPath($dom);
     $table = null;
 
-    foreach ($xpath->query("//table[contains(concat(' ', normalize-space(@class), ' '), ' wikitable ')]") as $candidate) {
-        if (str_contains($candidate->textContent, 'Issue date')) {
+    // On combined pages, only look at tables after the "Hot 100" heading, so other charts are skipped.
+    $heading = $xpath->query("//*[@id='Hot_100']")->item(0);
+    $tables = $heading !== null ? $xpath->query('following::table', $heading) : $xpath->query('//table');
+
+    foreach ($tables as $candidate) {
+        $isWikitable = str_contains(' ' . $candidate->getAttribute('class') . ' ', ' wikitable ');
+
+        if ($isWikitable && str_contains($candidate->textContent, 'Issue date')) {
             $table = $candidate;
             break;
         }
