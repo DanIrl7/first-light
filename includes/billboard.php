@@ -31,11 +31,20 @@ function billboard_number_one_on(DateTimeImmutable $date): ?array
     }
 
     return [
-        'song' => $best['song'],
-        'artist' => $best['artist'],
+        'song' => clean_chart_text($best['song']),
+        'artist' => clean_chart_text($best['artist']),
         'chart_date' => $best['date'],
         'chart' => 'Billboard Hot 100 (US)',
     ];
+}
+
+// Removes footnote symbols and stray quotes that Billboard's tables include, e.g. "Uptown Funk" †
+// Applied on read, so rows cached before this fix are cleaned too.
+function clean_chart_text(string $text): string
+{
+    $text = str_replace(['†', '‡', '*'], '', $text);
+
+    return trim($text, " \t\"“”'");
 }
 
 // All weekly number ones for a year, in date order: [['date' => 'Y-m-d', 'song' => ..., 'artist' => ...], ...]
