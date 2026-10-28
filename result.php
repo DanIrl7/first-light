@@ -18,7 +18,31 @@ function safe_url(?string $url): ?string
     return ($url !== null && str_starts_with($url, 'https://')) ? $url : null;
 }
 
+// Ask Wikimedia for a larger copy of an image. It only generates certain widths, so use a standard size.
+function display_image(?string $url, bool $hero = false): ?string
+{
+    if ($url === null) {
+        return null;
+    }
+
+    $width = $hero ? 1280 : 960;
+    $url = preg_replace('#/\d+px-([^/?]+)#', "/{$width}px-$1", $url);
+    $url = preg_replace('/width=\d+/', "width={$width}", $url);
+
+    return safe_url($url);
+}
+
 $day = build_day($_SESSION['profile']);
+
+$day['city']['image'] = display_image($day['city']['image'] ?? null, true);
+
+foreach ($day['events'] as $i => $event) {
+    $day['events'][$i]['image'] = display_image($event['image'] ?? null);
+}
+
+foreach ($day['people'] as $i => $person) {
+    $day['people'][$i]['image'] = display_image($person['image'] ?? null);
+}
 $birthday = new DateTimeImmutable($day['birthday']);
 $place = $day['place'];
 $region = $place['region'] !== '' ? $place['region'] . ', ' : '';
