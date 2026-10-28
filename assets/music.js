@@ -50,10 +50,14 @@
                 playsinline: 1,
                 rel: 0,
                 modestbranding: 1,
+                controls: 0, // no on-screen player controls
+                disablekb: 1, // no keyboard shortcuts either
             },
             events: {
                 onReady: () => {
                     playerReady = true;
+                    // A request, not a guarantee: YouTube may choose a different quality if 720p isn't available.
+                    player.setPlaybackQuality('hd720');
                     updateVolume();
 
                     if (playRequested) {

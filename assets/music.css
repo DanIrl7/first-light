@@ -15,14 +15,20 @@
     display: none;
 }
 
+/* Full width of the page, breaking out of the 680px column. The 16:9 ratio keeps the height proportional. */
 .video {
     position: relative;
-    width: 100%;
+    width: 100vw;
+    margin: 16px calc(50% - 50vw) 8px;
     aspect-ratio: 16 / 9;
-    margin: 16px 0 8px;
-    border-radius: 8px;
+    border-radius: 0;
     overflow: hidden;
     background: #000;
+}
+
+/* 100vw includes the scrollbar, so stop the full-width video from causing a sideways scroll. */
+body {
+    overflow-x: hidden;
 }
 
 .video iframe {
