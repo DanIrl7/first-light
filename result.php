@@ -1,6 +1,7 @@
 <?php
 require __DIR__ . '/includes/bootstrap.php';
 require __DIR__ . '/includes/day.php';
+require __DIR__ . '/includes/music.php';
 
 if (empty($_SESSION['profile'])) {
     set_flash('Enter your details first.');
@@ -23,6 +24,7 @@ $song = $day['song'];
 $searchUrl = $song !== null
     ? 'https://www.youtube.com/results?search_query=' . rawurlencode($song['song'] . ' ' . $song['artist'])
     : null;
+$videoId = $song !== null ? music_video_id($song['song'], $song['artist']) : null;
 ?>
 <!doctype html>
 <html lang="en">
@@ -32,6 +34,7 @@ $searchUrl = $song !== null
     <title>Born Here · <?= e($day['name']) ?></title>
     <link rel="stylesheet" href="assets/style.css">
     <link rel="stylesheet" href="assets/day.css">
+    <link rel="stylesheet" href="assets/music.css">
     <script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
@@ -125,7 +128,7 @@ $searchUrl = $song !== null
             <?php endforeach; ?>
         </section>
 
-        <section class="panel panel-music" id="music">
+        <section class="panel panel-music" id="music" data-video-id="<?= e($videoId ?? '') ?>">
             <h2>The top song that week</h2>
             <?php if ($song !== null): ?>
                 <p class="song-title">"<?= e($song['song']) ?>"</p>
@@ -133,10 +136,17 @@ $searchUrl = $song !== null
                     by <?= e($song['artist']) ?>
                     · No. 1 on the <?= e($song['chart']) ?> chart, week of <?= e((new DateTimeImmutable($song['chart_date']))->format('j F Y')) ?>
                 </p>
-                <p class="note">
-                    The music player isn't connected yet. For now you can
-                    <a href="<?= e($searchUrl) ?>" rel="noopener">search for this song on YouTube</a>.
-                </p>
+
+                <?php if ($videoId !== null): ?>
+                    <button type="button" id="music-play" class="music-button">Play music</button>
+                    <div id="music-player" class="video"></div>
+                    <p class="note" id="music-status"></p>
+                <?php else: ?>
+                    <p class="note">
+                        There's no music video linked for this song yet. You can
+                        <a href="<?= e($searchUrl) ?>" rel="noopener">search for it on YouTube</a>.
+                    </p>
+                <?php endif; ?>
             <?php else: ?>
                 <p class="meta">The Billboard Hot 100 chart starts in 1958, so there's no chart song for this date.</p>
             <?php endif; ?>
@@ -156,5 +166,6 @@ $searchUrl = $song !== null
     </main>
 
     <script src="assets/day.js"></script>
+    <script src="assets/music.js"></script>
 </body>
 </html>
