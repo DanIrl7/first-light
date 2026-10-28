@@ -1,12 +1,17 @@
 <?php
 
+// Local development uses the defaults. A hosted deployment sets these as environment variables:
+// DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS, DB_SSL, and YOUTUBE_API_KEY.
 return [
     'db' => [
-        'host' => '127.0.0.1',
-        'name' => 'born_here',
-        'user' => 'root',
-        'pass' => '',
+        'host' => getenv('DB_HOST') ?: '127.0.0.1',
+        'port' => (int) (getenv('DB_PORT') ?: 3306),
+        'name' => getenv('DB_NAME') ?: 'born_here',
+        'user' => getenv('DB_USER') ?: 'root',
+        'pass' => getenv('DB_PASS') ?: '',
         'charset' => 'utf8mb4',
+        // Hosted MySQL services such as TiDB Cloud require encrypted connections.
+        'ssl' => in_array(strtolower((string) getenv('DB_SSL')), ['1', 'true', 'yes'], true),
     ],
 
     // Wikimedia asks API clients to identify themselves with a descriptive User-Agent.

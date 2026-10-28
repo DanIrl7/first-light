@@ -1,0 +1,5 @@
+.git
+*.md
+schema.sql
+Dockerfile
+.dockerignore
