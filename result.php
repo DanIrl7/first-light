@@ -4,6 +4,9 @@ require __DIR__ . '/includes/day.php';
 require __DIR__ . '/includes/music.php';
 require __DIR__ . '/includes/youtube.php';
 
+// The first build for a birthday calls several slow APIs, so it can run longer than PHP's default 30 seconds.
+set_time_limit(120);
+
 if (empty($_SESSION['profile'])) {
     set_flash('Enter your details first.');
     redirect('index.php');
