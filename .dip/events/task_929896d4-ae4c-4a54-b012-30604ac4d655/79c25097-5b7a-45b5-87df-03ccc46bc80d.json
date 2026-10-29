@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "eventId": "79c25097-5b7a-45b5-87df-03ccc46bc80d",
+  "taskId": "task_929896d4-ae4c-4a54-b012-30604ac4d655",
+  "type": "task.create",
+  "payload": {
+    "title": "where do I put the api key",
+    "description": "where do I put the api key",
+    "kind": "discussion",
+    "requestState": "captured",
+    "status": "backlog",
+    "source": "prompt"
+  },
+  "actor": "claude:cfaed120-49e8-441b-8e86-239b7afcc3bc",
+  "createdAt": "2026-10-29T15:45:03.535Z",
+  "parents": [],
+  "branch": "main"
+}

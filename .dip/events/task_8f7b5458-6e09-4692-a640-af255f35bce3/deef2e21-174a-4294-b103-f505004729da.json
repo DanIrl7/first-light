@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "eventId": "deef2e21-174a-4294-b103-f505004729da",
+  "taskId": "task_8f7b5458-6e09-4692-a640-af255f35bce3",
+  "type": "task.create",
+  "payload": {
+    "title": "Ok, it's done",
+    "description": "Ok, it's done",
+    "kind": "discussion",
+    "requestState": "captured",
+    "status": "backlog",
+    "source": "prompt"
+  },
+  "actor": "claude:cfaed120-49e8-441b-8e86-239b7afcc3bc",
+  "createdAt": "2026-10-29T16:15:05.522Z",
+  "parents": [],
+  "branch": "main"
+}

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "eventId": "eb4fb582182b40c001018f4475f39b2e1a7fa28f9d6f8e285a02c9b4e4118c49",
+  "taskId": "_activity",
+  "type": "activity.batch",
+  "payload": {
+    "session": "filesystem",
+    "records": [
+      {
+        "at": "2026-10-29T16:09:24.193Z",
+        "kind": "files.changed",
+        "files": [
+          "data/videos.csv"
+        ],
+        "agent": "filesystem",
+        "branch": "main",
+        "recordId": "4159e64a-5ed4-4fac-a088-dc3650fd35f4"
+      }
+    ]
+  },
+  "actor": "recorder",
+  "createdAt": "2026-10-29T16:09:24.528Z",
+  "parents": [],
+  "branch": "main"
+}

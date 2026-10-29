@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "eventId": "6d7b46b2-ab24-4200-98dc-96d727bb1b2c",
+  "taskId": "task_22da8a1f-5bc7-42c3-9509-aeb3331ab268",
+  "type": "task.create",
+  "payload": {
+    "title": "Born Here: build the day-you-were-born site",
+    "description": "Scroll-driven PHP site from name, birthday and birth city. Full plan in PLAN.md.",
+    "actor": "DanIrl7",
+    "status": "backlog"
+  },
+  "actor": "DanIrl7",
+  "createdAt": "2026-10-29T02:53:03.647Z",
+  "parents": [],
+  "branch": "main"
+}

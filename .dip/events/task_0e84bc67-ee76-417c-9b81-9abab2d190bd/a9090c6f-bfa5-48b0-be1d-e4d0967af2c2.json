@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "eventId": "a9090c6f-bfa5-48b0-be1d-e4d0967af2c2",
+  "taskId": "task_0e84bc67-ee76-417c-9b81-9abab2d190bd",
+  "type": "task.create",
+  "payload": {
+    "title": "why was I getting an error earlier?",
+    "description": "why was I getting an error earlier?",
+    "kind": "discussion",
+    "requestState": "captured",
+    "status": "backlog",
+    "source": "prompt"
+  },
+  "actor": "claude:cfaed120-49e8-441b-8e86-239b7afcc3bc",
+  "createdAt": "2026-10-29T15:57:46.859Z",
+  "parents": [],
+  "branch": "main"
+}

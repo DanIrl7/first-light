@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "eventId": "fc66d207-5011-4457-8d3f-75b29aa9cf42",
+  "taskId": "task_e315612b-b09d-444a-ba24-9da4895a33a6",
+  "type": "task.create",
+  "payload": {
+    "title": "run dip init in born-here",
+    "description": "run dip init in born-here",
+    "kind": "discussion",
+    "requestState": "captured",
+    "status": "backlog",
+    "source": "prompt"
+  },
+  "actor": "claude:cfaed120-49e8-441b-8e86-239b7afcc3bc",
+  "createdAt": "2026-10-29T15:02:07.933Z",
+  "parents": [],
+  "branch": "main"
+}
