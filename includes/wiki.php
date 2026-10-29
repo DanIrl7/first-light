@@ -26,7 +26,8 @@ function wikidata_entities(array $ids): array
     $found = [];
 
     foreach (array_chunk($ids, 50) as $batch) {
-        $key = 'wikidata-sparql:' . md5(implode('|', $batch));
+        // The key is versioned so entries cached before the 'human' flag existed are not reused.
+        $key = 'wikidata-sparql-v2:' . md5(implode('|', $batch));
 
         $part = cache_remember($key, app_config()['cache_ttl']['wiki'], function () use ($batch) {
             $values = implode(' ', array_map(fn ($id) => "wd:$id", $batch));
@@ -42,9 +43,11 @@ function wikidata_entities(array $ids): array
                        (SAMPLE(?image) AS ?itemImage)
                        (SAMPLE(?birthplaceLabel) AS ?birthplaceName)
                        (SAMPLE(?locationLabel) AS ?locationName)
+                       (SAMPLE(?isHuman) AS ?human)
                        (COUNT(DISTINCT ?article) AS ?sitelinks)
                 WHERE {
                   VALUES ?item { $values }
+                  BIND(EXISTS { ?item wdt:P31 wd:Q5 } AS ?isHuman)
                   OPTIONAL { ?item rdfs:label ?label FILTER(LANG(?label) = "en") }
                   OPTIONAL { ?item schema:description ?desc FILTER(LANG(?desc) = "en") }
                   OPTIONAL { ?item wdt:P18 ?image }
@@ -77,6 +80,7 @@ function wikidata_entities(array $ids): array
                     'image' => $image !== null ? $image . '?width=800' : null,
                     'birthplace' => $row['birthplaceName']['value'] ?? null,
                     'location' => $row['locationName']['value'] ?? null,
+                    'human' => ($row['human']['value'] ?? 'false') === 'true',
                 ];
             }
 
@@ -109,9 +113,10 @@ function wiki_top_people(int $month, int $day, int $count = 5): array
     $ranked = [];
 
     foreach ($candidates as $id => $candidate) {
-        $entity = $entities[$id] ?? ['label' => null, 'description' => null, 'sitelinks' => 0, 'image' => null, 'birthplace' => null];
+        $entity = $entities[$id] ?? ['label' => null, 'description' => null, 'sitelinks' => 0, 'image' => null, 'birthplace' => null, 'human' => false];
 
-        if ($entity['label'] !== null) {
+        // Only people: the feed also links years, days and other non-person items.
+        if ($entity['label'] !== null && $entity['human']) {
             $ranked[] = [$entity, $candidate];
         }
     }
@@ -134,83 +139,137 @@ function wiki_top_people(int $month, int $day, int $count = 5): array
     return $people;
 }
 
-// The most famous events on this month and day, ranked by Wikidata sitelinks.
-// Events without a Wikidata match rank last, so the list still fills up when Wikidata has no entry.
-// Wikipedia gives no time of day for most events, so 'time' is null.
-function wiki_top_events(int $month, int $day, int $count = 12): array
+// Events Wikipedia lists for one date in one year, taken from that month's article (e.g. "January 1960").
+// Returns the entries in the order the article gives them, or an empty list when it has none.
+function wiki_year_events(int $year, int $month, int $day): array
 {
-    $candidates = [];
+    $monthName = (new DateTimeImmutable(sprintf('%04d-%02d-01', $year, $month)))->format('F');
+    $page = "$monthName $year";
 
-    foreach (wiki_feed('events', $month, $day) as $item) {
-        $page = $item['pages'][0] ?? null;
-        $id = $page['wikibase_item'] ?? null;
-
-        $candidates[] = [
-            'id' => $id,
-            'item' => $item,
+    $days = cache_remember('month-events:' . $page, app_config()['cache_ttl']['wiki'], function () use ($page) {
+        $data = http_get_json('https://en.wikipedia.org/w/api.php?' . http_build_query([
+            'action' => 'parse',
             'page' => $page,
-        ];
-    }
+            'prop' => 'wikitext',
+            'format' => 'json',
+            'formatversion' => 2,
+        ]));
 
-    $entities = wikidata_entities(array_column($candidates, 'id'));
+        $wikitext = $data['parse']['wikitext'] ?? null;
 
-    foreach ($candidates as $i => $candidate) {
-        $candidates[$i]['entity'] = $entities[$candidate['id']] ?? ['sitelinks' => 0, 'image' => null, 'location' => null];
-    }
+        return $wikitext === null ? null : wiki_parse_month_events($wikitext);
+    });
 
-    usort($candidates, fn ($a, $b) => $b['entity']['sitelinks'] <=> $a['entity']['sitelinks']);
+    $texts = $days[$monthName . ' ' . $day] ?? [];
 
-    $events = [];
-
-    foreach (array_slice($candidates, 0, $count) as $candidate) {
-        $events[] = [
-            'year' => $candidate['item']['year'] ?? null,
-            'text' => $candidate['item']['text'] ?? null,
-            'location' => $candidate['entity']['location'],
-            'time' => null,
-            'image' => $candidate['entity']['image'] ?? ($candidate['page']['thumbnail']['source'] ?? null),
-            'url' => $candidate['page']['content_urls']['desktop']['page'] ?? null,
-        ];
-    }
-
-    // Keep the 12 most famous, then show them oldest first so they follow the day's timeline.
-    usort($events, fn ($a, $b) => ($a['year'] ?? PHP_INT_MAX) <=> ($b['year'] ?? PHP_INT_MAX));
-
-    return $events;
+    return array_map(fn ($text) => [
+        'year' => $year,
+        'text' => $text,
+        'location' => null,
+        'time' => null,
+        'image' => null,
+        'url' => 'https://en.wikipedia.org/wiki/' . rawurlencode(str_replace(' ', '_', $page)),
+    ], $texts);
 }
 
-// Wikipedia summary for a city, found by searching "City Country".
+// Splits a month article into days: ['January 14' => ['Event text', ...], ...].
+// Each day starts with a heading like "==[[January 14]], 1960 (Thursday)==", followed by bullet points.
+function wiki_parse_month_events(string $wikitext): array
+{
+    $days = [];
+    $current = null;
+
+    foreach (explode("\n", $wikitext) as $line) {
+        if (preg_match('/^==\s*\[\[([A-Za-z]+ \d{1,2})\]\]/', $line, $match)) {
+            $current = $match[1];
+            $days[$current] ??= [];
+        } elseif (str_starts_with($line, '==')) {
+            $current = null;
+        } elseif ($current !== null && preg_match('/^\*+\s*(.+)$/', $line, $match)) {
+            $text = wiki_plain_text($match[1]);
+
+            if ($text !== '') {
+                $days[$current][] = $text;
+            }
+        }
+    }
+
+    return $days;
+}
+
+// Turns wikitext into plain text: drops references, templates and markup, and keeps the link text.
+function wiki_plain_text(string $wikitext): string
+{
+    $text = preg_replace(['/<ref[^>]*\/>/', '/<ref[^>]*>.*?<\/ref>/s', '/<!--.*?-->/s'], '', $wikitext);
+    $text = preg_replace('/\{\{(?:nowrap|nobr)\|([^{}]*)\}\}/i', '$1', $text);
+
+    // Templates can nest, so keep removing the innermost ones until none are left.
+    do {
+        $text = preg_replace('/\{\{[^{}]*\}\}/', '', $text, -1, $count);
+    } while ($count > 0);
+
+    $text = preg_replace('/\[\[(?:[^\]|]*\|)?([^\]]*)\]\]/', '$1', $text);
+    $text = preg_replace('/\[https?:\/\/\S+\s+([^\]]+)\]/', '$1', $text);
+    $text = preg_replace('/\[https?:\/\/[^\]]*\]/', '', $text);
+    $text = preg_replace("/'{2,}/", '', $text);
+
+    return trim(preg_replace('/\s+/', ' ', html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+}
+
+// Wikipedia summary for a city. Only an article that is about this city is used: its title must be the
+// city's name, it must not be a disambiguation page, and its summary must mention the country.
 function wiki_city_summary(string $city, string $country): ?array
 {
-    $key = 'city:' . mb_strtolower($city . '|' . $country);
+    $key = 'city-v2:' . mb_strtolower($city . '|' . $country);
 
     return cache_remember($key, app_config()['cache_ttl']['wiki'], function () use ($city, $country) {
         $search = http_get_json('https://en.wikipedia.org/w/api.php?' . http_build_query([
             'action' => 'opensearch',
-            'search' => "$city $country",
-            'limit' => 1,
+            'search' => $city,
+            'limit' => 10,
             'namespace' => 0,
             'format' => 'json',
         ]));
 
-        $title = $search[1][0] ?? null;
+        foreach ($search[1] ?? [] as $title) {
+            if (plain_name($title) !== plain_name($city)) {
+                continue;
+            }
 
-        if ($title === null) {
-            return null;
+            $summary = http_get_json('https://en.wikipedia.org/api/rest_v1/page/summary/'
+                . rawurlencode(str_replace(' ', '_', $title)));
+
+            if ($summary === null || ($summary['type'] ?? '') === 'disambiguation') {
+                continue;
+            }
+
+            if (!str_contains(fold_text($summary['extract'] ?? ''), fold_text($country))) {
+                continue;
+            }
+
+            return [
+                'title' => $summary['title'] ?? $title,
+                'extract' => $summary['extract'] ?? null,
+                'image' => $summary['thumbnail']['source'] ?? null,
+                'url' => $summary['content_urls']['desktop']['page'] ?? null,
+            ];
         }
 
-        $summary = http_get_json('https://en.wikipedia.org/api/rest_v1/page/summary/'
-            . rawurlencode(str_replace(' ', '_', $title)));
-
-        if ($summary === null) {
-            return null;
-        }
-
-        return [
-            'title' => $summary['title'] ?? $title,
-            'extract' => $summary['extract'] ?? null,
-            'image' => $summary['thumbnail']['source'] ?? null,
-            'url' => $summary['content_urls']['desktop']['page'] ?? null,
-        ];
+        return null;
     });
+}
+
+// A Wikipedia title without its qualifier, so "Spring (EP)" and "Șpring" compare as "spring".
+// Text after a comma is dropped too, so "Springs, Gauteng" stays a different place from "Spring".
+function plain_name(string $title): string
+{
+    return fold_text(trim(preg_replace('/\s*\(.*?\)|,.*$/', '', $title)));
+}
+
+// Lowercase with accents removed, so "Șpring" and "Spring" compare equal.
+function fold_text(string $text): string
+{
+    $folded = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $text);
+
+    return mb_strtolower($folded === false ? $text : $folded);
 }

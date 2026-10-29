@@ -18,6 +18,16 @@ function safe_url(?string $url): ?string
     return ($url !== null && str_starts_with($url, 'https://')) ? $url : null;
 }
 
+// Wikipedia gives years before 1 AD as negative numbers, so -83 is shown as 83 BC.
+function year_label(?int $year): string
+{
+    if ($year === null) {
+        return 'year unknown';
+    }
+
+    return $year < 0 ? abs($year) . ' BC' : (string) $year;
+}
+
 // Ask Wikimedia for a larger copy of an image. It only generates certain widths, so use a standard size.
 function display_image(?string $url, bool $hero = false): ?string
 {
@@ -106,10 +116,10 @@ $videoId = $song !== null
 
         <section class="panel">
             <h2>What happened that day</h2>
-            <p class="note">The 12 most notable events for this date, chosen by Wikipedia's editors and ranked by how many language editions cover them. Shown oldest first. Times appear only when a source gives one.</p>
+            <p class="note">Events Wikipedia lists for this date in <?= e($birthday->format('Y')) ?>, in the order its monthly article gives them.</p>
 
             <?php if ($day['events'] === []): ?>
-                <p class="meta">No events could be loaded for this date right now.</p>
+                <p class="meta">No events are listed for this date in <?= e($birthday->format('Y')) ?>.</p>
             <?php endif; ?>
 
             <?php foreach ($day['events'] as $event): ?>
@@ -146,7 +156,7 @@ $videoId = $song !== null
                     <?php endif; ?>
                     <h3><?= e($person['name']) ?></h3>
                     <p class="meta">
-                        Born <?= e((string) ($person['born_year'] ?? 'year unknown')) ?>
+                        Born <?= e(year_label($person['born_year'] ?? null)) ?>
                         in <?= e($person['birthplace'] ?? 'an unknown place') ?>
                     </p>
                     <?php if (!empty($person['known_for'])): ?>

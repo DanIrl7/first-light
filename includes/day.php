@@ -29,6 +29,6 @@ function build_day(array $profile): array
         'weather' => weather_at_noon($place['latitude'], $place['longitude'], $date->format('Y-m-d'), $place['timezone']),
         'song' => billboard_number_one_on($date),
         'people' => wiki_top_people($month, $day),
-        'events' => wiki_top_events($month, $day),
+        'events' => wiki_year_events((int) $date->format('Y'), $month, $day),
     ];
 }
