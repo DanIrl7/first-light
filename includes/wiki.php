@@ -95,6 +95,12 @@ function wikidata_entities(array $ids): array
     return $found;
 }
 
+// Wikidata gives Commons photos as http:// links, but the page only shows https:// images. Commons serves https too.
+function https_url(?string $url): ?string
+{
+    return $url === null ? null : preg_replace('#^http://#', 'https://', $url);
+}
+
 // The most famous people born on this month and day, ranked by Wikidata sitelinks.
 function wiki_top_people(int $month, int $day, int $count = 5): array
 {
@@ -131,7 +137,7 @@ function wiki_top_people(int $month, int $day, int $count = 5): array
             'born_year' => $candidate['year'],
             'known_for' => $entity['description'],
             'birthplace' => $entity['birthplace'],
-            'image' => $entity['image'] ?? ($candidate['page']['thumbnail']['source'] ?? null),
+            'image' => https_url($entity['image'] ?? ($candidate['page']['thumbnail']['source'] ?? null)),
             'url' => $candidate['page']['content_urls']['desktop']['page'] ?? null,
         ];
     }
@@ -146,7 +152,8 @@ function wiki_year_events(int $year, int $month, int $day): array
     $monthName = (new DateTimeImmutable(sprintf('%04d-%02d-01', $year, $month)))->format('F');
     $page = "$monthName $year";
 
-    $days = cache_remember('month-events:' . $page, app_config()['cache_ttl']['wiki'], function () use ($page) {
+    // The key is versioned because the parsing changed: entries now stop before the births and deaths lists.
+    $days = cache_remember('month-events-v3:' . $page, app_config()['cache_ttl']['wiki'], function () use ($page) {
         $data = http_get_json('https://en.wikipedia.org/w/api.php?' . http_build_query([
             'action' => 'parse',
             'page' => $page,
@@ -160,16 +167,58 @@ function wiki_year_events(int $year, int $month, int $day): array
         return $wikitext === null ? null : wiki_parse_month_events($wikitext);
     });
 
-    $texts = $days[$monthName . ' ' . $day] ?? [];
+    $entries = $days[$monthName . ' ' . $day] ?? [];
 
-    return array_map(fn ($text) => [
-        'year' => $year,
-        'text' => $text,
-        'location' => null,
-        'time' => null,
-        'image' => null,
-        'url' => 'https://en.wikipedia.org/wiki/' . rawurlencode(str_replace(' ', '_', $page)),
-    ], $texts);
+    return array_map(function ($entry) use ($year, $page) {
+        // An event links to the article about it, which is used for the photo and the "Wikipedia" link.
+        $article = $entry['page'];
+
+        return [
+            'year' => $year,
+            'text' => $entry['text'],
+            'location' => null,
+            'time' => null,
+            'image' => $article === null ? null : wiki_page_image($article),
+            'url' => 'https://en.wikipedia.org/wiki/' . rawurlencode(str_replace(' ', '_', $article ?? $page)),
+        ];
+    }, $entries);
+}
+
+// The main photo of a Wikipedia article, from its summary. Null when the article has none.
+function wiki_page_image(string $title): ?string
+{
+    $image = cache_remember('page-image:' . md5($title), app_config()['cache_ttl']['wiki'], function () use ($title) {
+        $summary = http_get_json('https://en.wikipedia.org/api/rest_v1/page/summary/'
+            . rawurlencode(str_replace(' ', '_', $title)));
+
+        if ($summary === null) {
+            return null;
+        }
+
+        // 'none' is cached for articles without a photo, so they aren't looked up again.
+        return $summary['thumbnail']['source'] ?? 'none';
+    });
+
+    return is_string($image) && $image !== 'none' ? $image : null;
+}
+
+// The first article a piece of wikitext links to, e.g. "Reserve Bank of Australia" for [[Reserve Bank of Australia]].
+// Links to dates and other namespaces (such as File: or Category:) are skipped.
+function wiki_first_link(string $wikitext): ?string
+{
+    preg_match_all('/\[\[([^\]|#]+)(?:#[^\]|]*)?(?:\|[^\]]*)?\]\]/', $wikitext, $matches);
+
+    foreach ($matches[1] as $target) {
+        $target = trim($target);
+
+        if (str_contains($target, ':') || preg_match('/^[A-Z][a-z]+ \d{1,2}$/', $target)) {
+            continue;
+        }
+
+        return $target;
+    }
+
+    return null;
 }
 
 // Splits a month article into days: ['January 14' => ['Event text', ...], ...].
@@ -178,18 +227,25 @@ function wiki_parse_month_events(string $wikitext): array
 {
     $days = [];
     $current = null;
+    $inEvents = false;
 
     foreach (explode("\n", $wikitext) as $line) {
         if (preg_match('/^==\s*\[\[([A-Za-z]+ \d{1,2})\]\]/', $line, $match)) {
             $current = $match[1];
             $days[$current] ??= [];
+            $inEvents = true;
         } elseif (str_starts_with($line, '==')) {
             $current = null;
-        } elseif ($current !== null && preg_match('/^\*+\s*(.+)$/', $line, $match)) {
-            $text = wiki_plain_text($match[1]);
+        } elseif ($current !== null && preg_match('/^(\*+)\s*(.+)$/', $line, $match)) {
+            $text = wiki_plain_text($match[2]);
 
-            if ($text !== '') {
-                $days[$current][] = $text;
+            // Each day also lists births, deaths and holidays. Those headings end the events list until the next event.
+            if ($match[1] === '*') {
+                $inEvents = !preg_match('/^(Born|Died|Births|Deaths|Holidays?|Observances?)\b/i', $text);
+            }
+
+            if ($inEvents && $text !== '') {
+                $days[$current][] = ['text' => $text, 'page' => wiki_first_link($match[2])];
             }
         }
     }

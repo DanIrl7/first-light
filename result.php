@@ -112,6 +112,23 @@ $videoId = $song !== null
                     <span class="meta">Weather for this day isn't available.</span>
                 <?php endif; ?>
             </div>
+
+            <?php if ($day['leaders']['head_of_state'] !== null || $day['leaders']['head_of_government'] !== null): ?>
+                <div class="leaders">
+                    <p class="meta">In charge of <?= e($place['country']) ?> that day</p>
+                    <?php foreach (['Head of state' => 'head_of_state', 'Head of government' => 'head_of_government'] as $title => $key): ?>
+                        <?php $leader = $day['leaders'][$key]; ?>
+                        <?php if ($leader !== null): ?>
+                            <figure class="leader">
+                                <?php if (safe_url($leader['image']) !== null): ?>
+                                    <img src="<?= e(safe_url($leader['image'])) ?>" alt="<?= e($leader['name']) ?>" width="96" loading="lazy">
+                                <?php endif; ?>
+                                <figcaption><?= e($title) ?>: <strong><?= e($leader['name']) ?></strong></figcaption>
+                            </figure>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </section>
 
         <section class="panel">
