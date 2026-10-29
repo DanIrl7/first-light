@@ -1,0 +1,2 @@
+# DIP event records can contain pasted commands and secrets; keep them local.
+.dip/events/
