@@ -31,12 +31,21 @@ body {
     overflow-x: hidden;
 }
 
+/* The player is a little taller than the frame and shifted up, so YouTube's title bar falls outside it. */
 .video iframe {
     position: absolute;
-    inset: 0;
+    top: -8%;
+    left: 0;
     width: 100%;
-    height: 100%;
+    height: 116%;
     border: 0;
+}
+
+/* A clear layer over the player, so clicks can't open the video on YouTube. */
+.video::after {
+    content: '';
+    position: absolute;
+    inset: 0;
 }
 
 @media print {

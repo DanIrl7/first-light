@@ -196,7 +196,7 @@ $videoId = $song !== null
                 </p>
 
                 <?php if ($videoId !== null): ?>
-                    <button type="button" id="music-play" class="music-button">Play music</button>
+                    <button type="button" id="music-play" class="music-button">Turn on sound</button>
                     <div class="video">
                         <div id="music-player"></div>
                     </div>

@@ -1,6 +1,6 @@
-// Music player for the chart song. The video loops inside its section, and its volume fades
-// out as the section scrolls off the screen. YouTube's player script loads only when the
-// visitor presses Play, so nothing is fetched from YouTube on page load.
+// Music player for the chart song. The video starts as soon as the page loads, muted, because browsers
+// only allow sound after the visitor interacts with the page. The first click or key press turns the sound on.
+// The video loops inside its section, and its volume eases down as the section scrolls off the screen.
 (function () {
     const section = document.getElementById('music');
     const button = document.getElementById('music-play');
@@ -13,11 +13,10 @@
 
     const videoId = section.dataset.videoId;
     const MAX_VOLUME = 80;
+    const MIN_VOLUME = 50; // the quietest it gets, however far the section is scrolled away
 
     let player = null;
     let playerReady = false;
-    let playRequested = false;
-    let apiRequested = false;
 
     function setStatus(text) {
         if (status) {
@@ -26,11 +25,6 @@
     }
 
     function loadApi() {
-        if (apiRequested) {
-            return;
-        }
-
-        apiRequested = true;
         window.onYouTubeIframeAPIReady = createPlayer;
 
         const script = document.createElement('script');
@@ -45,6 +39,8 @@
             width: '100%',
             height: '100%',
             playerVars: {
+                autoplay: 1,
+                mute: 1, // starts muted; the sound is turned on after the visitor's first click or key press
                 loop: 1,
                 playlist: videoId, // YouTube only loops a video when it's also listed as the playlist
                 playsinline: 1,
@@ -52,17 +48,20 @@
                 modestbranding: 1,
                 controls: 0, // no on-screen player controls
                 disablekb: 1, // no keyboard shortcuts either
+                iv_load_policy: 3, // no annotation cards over the video
+                fs: 0, // no fullscreen button
             },
             events: {
                 onReady: () => {
                     playerReady = true;
                     // A request, not a guarantee: YouTube may choose a different quality if 720p isn't available.
                     player.setPlaybackQuality('hd720');
+                    // Captions are turned off here, since YouTube can show them by default.
+                    player.unloadModule('captions');
+                    player.unloadModule('cc');
                     updateVolume();
-
-                    if (playRequested) {
-                        startPlayback();
-                    }
+                    player.playVideo();
+                    setStatus('Playing without sound. Click anywhere to turn it on.');
                 },
                 onError: (event) => {
                     button.hidden = true;
@@ -86,23 +85,35 @@
         return (reasons[code] || 'This video can\'t be played here.') + ' You can search for the song on YouTube instead.';
     }
 
-    function startPlayback() {
-        player.playVideo();
-        setStatus('The video loops and fades out as you scroll away from it.');
+    function turnOnSound() {
+        if (!playerReady) {
+            return;
+        }
+
+        player.unMute();
+        button.hidden = true;
+        setStatus('The video loops and gets quieter as you scroll away from it.');
+        updateVolume();
     }
 
-    button.addEventListener('click', () => {
-        playRequested = true;
-        button.hidden = true;
+    button.addEventListener('click', turnOnSound);
 
-        if (playerReady) {
-            startPlayback();
-        } else {
-            loadApi();
+    // The first click or key press anywhere on the page turns the sound on. Browsers accept that as the
+    // visitor's permission, so the sound isn't blocked. Once it's on, these listeners are removed.
+    function onFirstInteraction() {
+        if (!playerReady) {
+            return;
         }
-    });
 
-    // Full volume while the section is on screen, fading to silent over one screen height away.
+        document.removeEventListener('pointerdown', onFirstInteraction);
+        document.removeEventListener('keydown', onFirstInteraction);
+        turnOnSound();
+    }
+
+    document.addEventListener('pointerdown', onFirstInteraction);
+    document.addEventListener('keydown', onFirstInteraction);
+
+    // Full volume while the section is on screen, easing down to the minimum over one screen height away.
     function updateVolume() {
         if (!player || !playerReady) {
             return;
@@ -118,8 +129,8 @@
             distance = rect.top - viewport;
         }
 
-        const fade = Math.max(0, 1 - distance / viewport);
-        player.setVolume(Math.round(fade * MAX_VOLUME));
+        const fade = Math.min(1, distance / viewport);
+        player.setVolume(Math.round(MAX_VOLUME - (MAX_VOLUME - MIN_VOLUME) * fade));
     }
 
     let frame = null;
@@ -141,4 +152,6 @@
             player.pauseVideo();
         }
     });
+
+    loadApi();
 })();
