@@ -10,15 +10,21 @@ $today = (new DateTimeImmutable('today'))->format('Y-m-d');
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Born Here</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Playfair+Display:ital,wght@0,400;0,700;0,800;1,400;1,600&amp;display=swap">
     <link rel="stylesheet" href="assets/style.css">
     <link rel="stylesheet" href="assets/calendar.css">
     <link rel="stylesheet" href="assets/places.css">
     <script>document.documentElement.classList.add('js');</script>
 </head>
-<body>
+<body class="page-start">
+    <div class="glow" aria-hidden="true"></div>
+
     <main>
-        <h1>Born Here</h1>
-        <p class="intro">Enter your details to see what the world looked like the day you were born.</p>
+        <p class="eyebrow" data-intro>A scroll through your first day</p>
+        <h1 data-intro>Born <em>Here</em></h1>
+        <p class="intro" data-intro>Enter your details to see what the world looked like the day you were born.</p>
 
         <?php if ($flash !== null): ?>
             <p class="flash"><?= e($flash) ?></p>
@@ -65,7 +71,9 @@ $today = (new DateTimeImmutable('today'))->format('Y-m-d');
         </form>
     </main>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="assets/calendar.js"></script>
     <script src="assets/places.js"></script>
+    <script src="assets/start.js"></script>
 </body>
 </html>

@@ -13,12 +13,23 @@
     width: 100%;
     text-align: left;
     font: inherit;
-    padding: 8px;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    letter-spacing: normal;
+    text-transform: none;
+    padding: 12px 14px;
     border: 1px solid var(--border);
-    border-radius: 6px;
-    background: var(--bg);
+    border-radius: 10px;
+    background: rgba(11, 10, 9, 0.7);
     color: var(--text);
     cursor: pointer;
+    transform: none;
+}
+
+.date-picker-toggle:hover {
+    background: rgba(11, 10, 9, 0.7);
+    border-color: rgba(239, 231, 216, 0.3);
+    transform: none;
 }
 
 .date-picker-panel {
@@ -111,7 +122,7 @@
 
 .date-picker-day.selected {
     background: var(--accent);
-    color: #ffffff;
+    color: var(--on-accent);
 }
 
 .date-picker-day:focus-visible,

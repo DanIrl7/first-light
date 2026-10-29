@@ -1,34 +1,11 @@
-/* Music player. Colours come from the :root tokens in style.css. */
+/* Music player. Colours come from the :root tokens in style.css; the full-width frame is sized in day.css. */
 
 .music-button {
-    font: inherit;
-    padding: 8px 14px;
-    border: 0;
-    border-radius: 6px;
-    background: var(--accent);
-    color: #ffffff;
-    cursor: pointer;
-    justify-self: start;
+    margin-top: 1.5rem;
 }
 
 .music-button[hidden] {
     display: none;
-}
-
-/* Full width of the page, breaking out of the 680px column. The 16:9 ratio keeps the height proportional. */
-.video {
-    position: relative;
-    width: 100vw;
-    margin: 16px calc(50% - 50vw) 8px;
-    aspect-ratio: 16 / 9;
-    border-radius: 0;
-    overflow: hidden;
-    background: #000;
-}
-
-/* 100vw includes the scrollbar, so stop the full-width video from causing a sideways scroll. */
-body {
-    overflow-x: hidden;
 }
 
 /* The player is a little taller than the frame and shifted up, so YouTube's title bar falls outside it. */

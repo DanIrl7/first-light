@@ -1,48 +1,135 @@
+/* Shared base and the start page. Projector-light palette: warm black, film-gold, cream.
+   The day page adds its own rules in day.css. */
+
 :root {
-    --bg: #f7f5f0;
-    --card: #ffffff;
-    --text: #222222;
-    --muted: #666666;
-    --accent: #2f6f4f;
-    --border: #dcd8cc;
-}
+    color-scheme: dark;
 
-@media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-        --bg: #161816;
-        --card: #1f231f;
-        --text: #eeeeea;
-        --muted: #a3a79f;
-        --accent: #7fbf9a;
-        --border: #3a3f3a;
-    }
-}
+    --bg: #0b0a09;
+    --surface: #12100d;
+    --card: #181511;
+    --text: #efe7d8;
+    --muted: #a79f90;
+    --accent: #e4b363;
+    --accent-deep: #b9822f;
+    --on-accent: #17110a;
+    --border: rgba(239, 231, 216, 0.16);
 
-:root[data-theme="dark"] {
-    --bg: #161816;
-    --card: #1f231f;
-    --text: #eeeeea;
-    --muted: #a3a79f;
-    --accent: #7fbf9a;
-    --border: #3a3f3a;
+    --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
+    --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+
+    --gutter: clamp(20px, 5vw, 72px);
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 * {
     box-sizing: border-box;
 }
 
+html {
+    background: var(--bg);
+}
+
 body {
     margin: 0;
     background: var(--bg);
     color: var(--text);
-    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-    line-height: 1.5;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
 }
 
-main {
-    max-width: 560px;
+/* Film grain over everything. It sits above the page but never takes clicks. */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    opacity: 0.07;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+a {
+    color: var(--accent);
+    text-underline-offset: 0.2em;
+}
+
+:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+}
+
+h1,
+h2,
+h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.015em;
+}
+
+/* Small uppercase labels in the mono face. */
+.eyebrow {
+    margin: 0 0 1rem;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+}
+
+/* Start page */
+
+.page-start main {
+    position: relative;
+    z-index: 1;
+    max-width: 640px;
     margin: 0 auto;
-    padding: 24px 16px;
+    padding: clamp(56px, 12vh, 120px) var(--gutter) 80px;
+}
+
+/* A slow pool of warm light behind the form. Only transform is animated. */
+.glow {
+    position: fixed;
+    inset: -20vmax auto auto 50%;
+    z-index: 0;
+    width: 90vmax;
+    height: 90vmax;
+    margin-left: -45vmax;
+    pointer-events: none;
+    background: radial-gradient(closest-side, rgba(228, 179, 99, 0.22), rgba(200, 85, 61, 0.08) 55%, transparent 75%);
+    filter: blur(20px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .glow {
+        animation: drift 22s ease-in-out infinite alternate;
+    }
+}
+
+@keyframes drift {
+    from {
+        transform: translate3d(-6vmax, 0, 0) scale(1);
+    }
+
+    to {
+        transform: translate3d(6vmax, 5vmax, 0) scale(1.12);
+    }
+}
+
+.page-start h1 {
+    margin: 0 0 1.25rem;
+    font-size: clamp(3rem, 11vw, 6.5rem);
+    line-height: 0.95;
+    font-weight: 800;
+}
+
+.page-start h1 em {
+    color: var(--accent);
+    font-weight: 400;
 }
 
 .intro,
@@ -50,54 +137,99 @@ main {
     color: var(--muted);
 }
 
+.intro {
+    max-width: 34ch;
+    margin: 0 0 2.5rem;
+    font-size: 1.15rem;
+}
+
 .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 16px;
-    margin: 12px 0;
     display: grid;
-    gap: 10px;
+    gap: 1.1rem;
+    padding: clamp(20px, 4vw, 32px);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: rgba(24, 21, 17, 0.72);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
 }
 
 label {
     display: grid;
-    gap: 4px;
+    gap: 6px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
 }
 
 input {
-    font: inherit;
-    padding: 8px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    background: var(--bg);
-    color: var(--text);
     width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: rgba(11, 10, 9, 0.7);
+    color: var(--text);
+    font: inherit;
+    font-size: 1rem;
+    letter-spacing: normal;
+    text-transform: none;
+    transition: border-color 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
+}
+
+input:hover {
+    border-color: rgba(239, 231, 216, 0.3);
+}
+
+input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(228, 179, 99, 0.2);
+    outline: none;
+}
+
+input::placeholder {
+    color: rgba(167, 159, 144, 0.7);
 }
 
 button {
-    font: inherit;
-    padding: 8px 14px;
-    border: 0;
-    border-radius: 6px;
-    background: var(--accent);
-    color: #ffffff;
-    cursor: pointer;
     justify-self: start;
+    padding: 13px 26px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--on-accent);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s var(--ease-out), background-color 0.2s var(--ease-out);
+}
+
+button:hover {
+    background: #f0c47d;
+    transform: translateY(-2px);
+}
+
+button:active {
+    transform: scale(0.97);
 }
 
 .hint {
+    margin-top: -0.5rem;
     font-size: 0.85rem;
-    margin-top: -6px;
 }
 
 .flash {
+    margin: 0 0 1.5rem;
+    padding: 12px 16px;
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
     background: var(--card);
-    border-left: 4px solid var(--accent);
-    padding: 10px 12px;
-    border-radius: 6px;
 }
 
-a {
-    color: var(--accent);
+@media (prefers-reduced-motion: reduce) {
+    button,
+    input {
+        transition: none;
+    }
 }

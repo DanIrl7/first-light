@@ -73,124 +73,166 @@ $videoId = $song !== null
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Born Here · <?= e($day['name']) ?></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Playfair+Display:ital,wght@0,400;0,700;0,800;1,400;1,600&amp;display=swap">
     <link rel="stylesheet" href="assets/style.css">
     <link rel="stylesheet" href="assets/day.css">
     <link rel="stylesheet" href="assets/music.css">
     <script>document.documentElement.classList.add('js');</script>
 </head>
-<body>
+<body class="page-day">
+    <div class="progress" aria-hidden="true"><span></span></div>
+
     <div class="clock" aria-hidden="true">
         <span class="clock-time" id="clock-time">00:00</span>
         <span class="clock-date"><?= e($birthday->format('j M Y')) ?></span>
     </div>
 
     <main class="day">
-        <section class="panel panel-intro">
-            <p class="eyebrow">Born here</p>
-            <h1><?= e($day['name']) ?>, you arrived in <?= e($place['name']) ?>.</h1>
-            <p class="meta">
-                <?= e($birthday->format('j F Y')) ?> · <?= e($region . $place['country']) ?>
-            </p>
-
+        <section class="scene scene-hero">
             <?php if ($cityImage !== null): ?>
-                <img class="hero" src="<?= e($cityImage) ?>" alt="<?= e($place['name']) ?>" loading="lazy">
+                <div class="hero-media">
+                    <img class="hero-img" src="<?= e($cityImage) ?>" alt="<?= e($place['name']) ?>" fetchpriority="high">
+                </div>
+                <div class="hero-shade"></div>
             <?php endif; ?>
 
-            <?php if (!empty($day['city']['extract'])): ?>
-                <p><?= e($day['city']['extract']) ?></p>
-                <?php if ($cityUrl !== null): ?>
-                    <p><a href="<?= e($cityUrl) ?>" rel="noopener">Read more on Wikipedia</a></p>
-                <?php endif; ?>
-            <?php endif; ?>
+            <div class="hero-copy">
+                <p class="eyebrow">Born here</p>
+                <h1 data-split><?= e($day['name']) ?>, you arrived in <em><?= e($place['name']) ?></em>.</h1>
+                <p class="meta">
+                    <?= e($birthday->format('j F Y')) ?> · <?= e($region . $place['country']) ?>
+                </p>
+            </div>
 
-            <div class="weather">
-                <?php if ($day['weather'] !== null): ?>
-                    <strong><?= e((string) $day['weather']['temperature_c']) ?>°C</strong>
-                    · <?= e($day['weather']['condition']) ?>
-                    <span class="meta">at <?= e($day['weather']['time']) ?></span>
-                <?php else: ?>
-                    <span class="meta">Weather for this day isn't available.</span>
-                <?php endif; ?>
+            <div class="scroll-cue" aria-hidden="true">Scroll</div>
+        </section>
+
+        <section class="scene scene-place">
+            <div class="place-grid">
+                <div>
+                    <p class="eyebrow" data-reveal>The place</p>
+                    <?php if (!empty($day['city']['extract'])): ?>
+                        <p class="lede" data-reveal><?= e($day['city']['extract']) ?></p>
+                        <?php if ($cityUrl !== null): ?>
+                            <p data-reveal><a href="<?= e($cityUrl) ?>" rel="noopener">Read more on Wikipedia</a></p>
+                        <?php endif; ?>
+                    <?php else: ?>
+                        <p class="lede" data-reveal><?= e($place['name']) ?>, <?= e($place['country']) ?>.</p>
+                    <?php endif; ?>
+                </div>
+
+                <div class="weather" data-reveal>
+                    <p class="eyebrow">The weather</p>
+                    <?php if ($day['weather'] !== null): ?>
+                        <?php
+                        $temperature = (float) $day['weather']['temperature_c'];
+                        $decimals = $temperature === round($temperature) ? 0 : 1;
+                        ?>
+                        <span class="temp" data-count="<?= e((string) $temperature) ?>" data-decimals="<?= $decimals ?>"><?= e(number_format($temperature, $decimals, '.', '')) ?></span>
+                        <p class="weather-detail">
+                            °C · <?= e($day['weather']['condition']) ?>
+                            <span class="meta">at <?= e($day['weather']['time']) ?></span>
+                        </p>
+                    <?php else: ?>
+                        <p class="meta">Weather for this day isn't available.</p>
+                    <?php endif; ?>
+                </div>
             </div>
 
             <?php if ($day['leaders']['head_of_state'] !== null || $day['leaders']['head_of_government'] !== null): ?>
-                <div class="leaders">
-                    <p class="meta">In charge of <?= e($place['country']) ?> that day</p>
-                    <?php foreach (['Head of state' => 'head_of_state', 'Head of government' => 'head_of_government'] as $title => $key): ?>
-                        <?php $leader = $day['leaders'][$key]; ?>
-                        <?php if ($leader !== null): ?>
-                            <figure class="leader">
-                                <?php if (safe_url($leader['image']) !== null): ?>
-                                    <img src="<?= e(safe_url($leader['image'])) ?>" alt="<?= e($leader['name']) ?>" width="96" loading="lazy">
-                                <?php endif; ?>
-                                <figcaption><?= e($title) ?>: <strong><?= e($leader['name']) ?></strong></figcaption>
-                            </figure>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
+                <div class="leaders" data-reveal>
+                    <p class="eyebrow">In charge of <?= e($place['country']) ?> that day</p>
+                    <div class="leaders-row">
+                        <?php foreach (['Head of state' => 'head_of_state', 'Head of government' => 'head_of_government'] as $title => $key): ?>
+                            <?php $leader = $day['leaders'][$key]; ?>
+                            <?php if ($leader !== null): ?>
+                                <figure class="leader">
+                                    <?php if (safe_url($leader['image']) !== null): ?>
+                                        <img src="<?= e(safe_url($leader['image'])) ?>" alt="" width="64" height="64" loading="lazy">
+                                    <?php endif; ?>
+                                    <figcaption><?= e($title) ?><strong><?= e($leader['name']) ?></strong></figcaption>
+                                </figure>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
             <?php endif; ?>
         </section>
 
-        <section class="panel">
-            <h2>What happened that day</h2>
-            <p class="note">Events Wikipedia lists for this date in <?= e($birthday->format('Y')) ?>, in the order its monthly article gives them.</p>
+        <section class="scene scene-events">
+            <p class="eyebrow">The world that day</p>
+            <h2 data-split>What happened that day</h2>
+            <p class="note" data-reveal>Events Wikipedia lists for this date in <?= e($birthday->format('Y')) ?>, in the order its monthly article gives them.</p>
 
             <?php if ($day['events'] === []): ?>
                 <p class="meta">No events are listed for this date in <?= e($birthday->format('Y')) ?>.</p>
             <?php endif; ?>
 
             <?php foreach ($day['events'] as $event): ?>
-                <article class="card event">
-                    <?php if (safe_url($event['image'] ?? null) !== null): ?>
-                        <img src="<?= e(safe_url($event['image'])) ?>" alt="" loading="lazy">
+                <?php $eventImage = safe_url($event['image'] ?? null); ?>
+                <article class="event<?= $eventImage === null ? ' no-media' : '' ?>">
+                    <?php if ($eventImage !== null): ?>
+                        <div class="event-media">
+                            <img src="<?= e($eventImage) ?>" alt="" loading="lazy">
+                        </div>
                     <?php endif; ?>
-                    <p class="event-year"><?= e((string) ($event['year'] ?? 'Year unknown')) ?></p>
-                    <p><?= e($event['text'] ?? '') ?></p>
-                    <?php if (!empty($event['location']) || !empty($event['time'])): ?>
-                        <p class="meta">
-                            <?= e(implode(' · ', array_filter([$event['location'] ?? null, $event['time'] ?? null]))) ?>
-                        </p>
-                    <?php endif; ?>
-                    <?php if (safe_url($event['url'] ?? null) !== null): ?>
-                        <a href="<?= e(safe_url($event['url'])) ?>" rel="noopener">Wikipedia</a>
-                    <?php endif; ?>
+                    <div class="event-body">
+                        <p class="event-year"><?= e((string) ($event['year'] ?? 'Year unknown')) ?></p>
+                        <p class="event-text"><?= e($event['text'] ?? '') ?></p>
+                        <?php if (!empty($event['location']) || !empty($event['time'])): ?>
+                            <p class="meta">
+                                <?= e(implode(' · ', array_filter([$event['location'] ?? null, $event['time'] ?? null]))) ?>
+                            </p>
+                        <?php endif; ?>
+                        <?php if (safe_url($event['url'] ?? null) !== null): ?>
+                            <p><a href="<?= e(safe_url($event['url'])) ?>" rel="noopener">Wikipedia</a></p>
+                        <?php endif; ?>
+                    </div>
                 </article>
             <?php endforeach; ?>
         </section>
 
-        <section class="panel">
-            <h2>Born on this day</h2>
-            <p class="note">Five of the most widely covered people born on this date, ranked the same way. Shown for what they're known for, not judged.</p>
+        <section class="scene scene-people">
+            <p class="eyebrow">Your birthday twins</p>
+            <h2 data-split>Born on this day</h2>
+            <p class="note" data-reveal>Five of the most widely covered people born on this date, ranked the same way. Shown for what they're known for, not judged.</p>
 
             <?php if ($day['people'] === []): ?>
-                <p class="meta">No people could be loaded for this date right now.</p>
+                <p class="meta" style="margin-inline: var(--gutter)">No people could be loaded for this date right now.</p>
+            <?php else: ?>
+                <div class="people-track">
+                    <?php foreach ($day['people'] as $person): ?>
+                        <article class="person">
+                            <?php if (safe_url($person['image'] ?? null) !== null): ?>
+                                <img class="person-photo" src="<?= e(safe_url($person['image'])) ?>" alt="<?= e($person['name']) ?>">
+                            <?php else: ?>
+                                <div class="person-photo person-placeholder" aria-hidden="true"><?= e(mb_substr($person['name'], 0, 1)) ?></div>
+                            <?php endif; ?>
+                            <h3><?= e($person['name']) ?></h3>
+                            <p class="meta">
+                                Born <?= e(year_label($person['born_year'] ?? null)) ?>
+                                in <?= e($person['birthplace'] ?? 'an unknown place') ?>
+                            </p>
+                            <?php if (!empty($person['known_for'])): ?>
+                                <p><?= e(ucfirst($person['known_for'])) ?></p>
+                            <?php endif; ?>
+                            <?php if (safe_url($person['url'] ?? null) !== null): ?>
+                                <p><a href="<?= e(safe_url($person['url'])) ?>" rel="noopener">Wikipedia</a></p>
+                            <?php endif; ?>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
             <?php endif; ?>
-
-            <?php foreach ($day['people'] as $person): ?>
-                <article class="card person">
-                    <?php if (safe_url($person['image'] ?? null) !== null): ?>
-                        <img src="<?= e(safe_url($person['image'])) ?>" alt="<?= e($person['name']) ?>" loading="lazy">
-                    <?php endif; ?>
-                    <h3><?= e($person['name']) ?></h3>
-                    <p class="meta">
-                        Born <?= e(year_label($person['born_year'] ?? null)) ?>
-                        in <?= e($person['birthplace'] ?? 'an unknown place') ?>
-                    </p>
-                    <?php if (!empty($person['known_for'])): ?>
-                        <p><?= e(ucfirst($person['known_for'])) ?></p>
-                    <?php endif; ?>
-                    <?php if (safe_url($person['url'] ?? null) !== null): ?>
-                        <a href="<?= e(safe_url($person['url'])) ?>" rel="noopener">Wikipedia</a>
-                    <?php endif; ?>
-                </article>
-            <?php endforeach; ?>
         </section>
 
-        <section class="panel panel-music" id="music" data-video-id="<?= e($videoId ?? '') ?>">
-            <h2>The top song that week</h2>
+        <section class="scene scene-music" id="music" data-video-id="<?= e($videoId ?? '') ?>">
+            <p class="eyebrow">The soundtrack</p>
+            <h2 data-split>The top song that week</h2>
             <?php if ($song !== null): ?>
-                <p class="song-title">"<?= e($song['song']) ?>"</p>
-                <p class="meta">
+                <p class="song-title" data-reveal>"<?= e($song['song']) ?>"</p>
+                <p class="meta" data-reveal>
                     by <?= e($song['artist']) ?>
                     · No. 1 on the <?= e($song['chart']) ?> chart, week of <?= e((new DateTimeImmutable($song['chart_date']))->format('j F Y')) ?>
                 </p>
@@ -212,20 +254,25 @@ $videoId = $song !== null
             <?php endif; ?>
         </section>
 
-        <section class="panel panel-certificate">
-            <h2>Certificate of arrival</h2>
-            <p class="certificate-text">
-                This certifies that <strong><?= e($day['name']) ?></strong> arrived in
-                <strong><?= e($place['name']) ?></strong>, <?= e($place['country']) ?>,
-                on <strong><?= e($birthday->format('j F Y')) ?></strong>.
-            </p>
-            <button type="button" class="print-button" onclick="window.print()">Print certificate</button>
+        <section class="scene scene-certificate">
+            <div class="certificate">
+                <p class="eyebrow">Certificate of arrival</p>
+                <p class="certificate-text">
+                    This certifies that <strong><?= e($day['name']) ?></strong> arrived in
+                    <strong><?= e($place['name']) ?></strong>, <?= e($place['country']) ?>,
+                    on <strong><?= e($birthday->format('j F Y')) ?></strong>.
+                </p>
+                <button type="button" class="print-button" onclick="window.print()">Print certificate</button>
+            </div>
         </section>
 
         <p class="admin-link"><a href="index.php">Start over</a></p>
     </main>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <script src="assets/day.js"></script>
+    <script src="assets/cinema.js"></script>
     <script src="assets/music.js"></script>
 </body>
 </html>
