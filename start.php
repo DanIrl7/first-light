@@ -3,7 +3,7 @@ require __DIR__ . '/includes/bootstrap.php';
 require __DIR__ . '/includes/geocode.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    redirect('index.php');
+    redirect('/');
 }
 
 verify_csrf();
@@ -60,7 +60,7 @@ if (($_POST['place_latitude'] ?? '') !== '') {
 
 if ($errors !== []) {
     remember_form($_POST, $errors);
-    redirect('index.php');
+    redirect('/');
 }
 
 // Keep only what the next steps need. Name and birthday stay in the session, never in the URL.
@@ -70,5 +70,5 @@ $_SESSION['profile'] = [
     'place' => $place,
 ];
 
-// The loading screen gathers the day with visible progress, then moves on to result.php.
-redirect('loading.php');
+// The loading screen gathers the day with visible progress, then moves on to /result.
+redirect('/loading');

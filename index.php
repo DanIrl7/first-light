@@ -49,7 +49,7 @@ if ($placeText === '' && old_value($old, 'place_latitude') !== '') {
             <p class="flash" role="alert"><?= e($flash) ?></p>
         <?php endif; ?>
 
-        <form method="post" action="start.php" class="card" id="born-form" novalidate>
+        <form method="post" action="/start" class="card" id="born-form" novalidate>
             <?= csrf_field() ?>
 
             <label>Name

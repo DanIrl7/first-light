@@ -74,7 +74,7 @@
         // A short pause so the full bar is seen, then fade out and go.
         setTimeout(() => {
             root.classList.add('is-leaving');
-            setTimeout(() => location.replace('result.php'), 500);
+            setTimeout(() => location.replace('/result'), 500);
         }, 500);
     }
 
@@ -109,7 +109,7 @@
         let ended = false;
 
         try {
-            const response = await fetch('build.php', { method: 'POST', body: body, credentials: 'same-origin' });
+            const response = await fetch('/build', { method: 'POST', body: body, credentials: 'same-origin' });
 
             if (!response.ok) {
                 throw new Error('Request failed: ' + response.status);

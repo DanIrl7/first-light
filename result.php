@@ -9,7 +9,7 @@ set_time_limit(120);
 
 if (empty($_SESSION['profile'])) {
     set_flash('Enter your details first.');
-    redirect('index.php');
+    redirect('/');
 }
 
 // Only allow links and images from https, so external data can't inject a javascript: URL.
@@ -305,7 +305,7 @@ $videoId = $song !== null
             </div>
         </section>
 
-        <p class="admin-link"><a href="index.php">Start over</a></p>
+        <p class="admin-link"><a href="/">Start over</a></p>
     </main>
     </div>
     </div>

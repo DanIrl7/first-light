@@ -34,8 +34,10 @@ Requirements: PHP 8.4 with the `pdo_mysql` and `curl` extensions, and a MySQL or
 2. Start the server from this folder:
 
    ```bash
-   php -S localhost:8000
+   php -S localhost:8000 -t . scripts/router.php
    ```
+
+   The router gives the built-in server the same clean URLs as the live site (`/result` instead of `/result.php`).
 
 3. Open http://localhost:8000.
 
@@ -92,4 +94,6 @@ A song with no entry falls back to the YouTube API if a key is set. Otherwise it
 - `data/videos.csv`: video IDs for chart songs
 - `schema.sql`: the database schema
 - `Dockerfile`: the container used for hosting
+- `docker/clean-urls.conf`: Apache rules for clean URLs on the live site
+- `scripts/router.php`: the same clean URLs for `php -S` locally
 - `PLAN.md`: the original project plan

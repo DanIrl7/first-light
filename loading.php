@@ -3,7 +3,7 @@ require __DIR__ . '/includes/bootstrap.php';
 
 if (empty($_SESSION['profile'])) {
     set_flash('Enter your details first.');
-    redirect('index.php');
+    redirect('/');
 }
 
 $profile = $_SESSION['profile'];
@@ -37,7 +37,7 @@ $steps = [
     <link rel="stylesheet" href="assets/loading.css">
     <script src="assets/dev-motion.js"></script>
     <script>document.documentElement.classList.add('js');</script>
-    <noscript><meta http-equiv="refresh" content="0;url=result.php"></noscript>
+    <noscript><meta http-equiv="refresh" content="0;url=/result"></noscript>
 </head>
 <body class="page-loading">
     <div class="glow" aria-hidden="true"></div>
@@ -63,7 +63,7 @@ $steps = [
         <div class="loading-failed" id="loading-failed" hidden>
             <p id="loading-error" role="alert"></p>
             <button type="button" id="loading-retry">Try again</button>
-            <a href="index.php">Back to the form</a>
+            <a href="/">Back to the form</a>
         </div>
     </main>
 
