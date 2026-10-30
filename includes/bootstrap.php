@@ -44,6 +44,33 @@ function pull_flash(): ?string
     return $message;
 }
 
+// After a failed submit, keep what the visitor typed (in the session, never in the URL) so the form
+// can be filled in again, together with one message per field.
+function remember_form(array $post, array $errors): void
+{
+    $keep = ['name', 'birthday', 'place_search', 'city', 'country', 'place_name', 'place_region',
+        'place_country', 'place_country_code', 'place_latitude', 'place_longitude', 'place_timezone'];
+    $old = [];
+
+    foreach ($keep as $key) {
+        $value = $post[$key] ?? '';
+        $old[$key] = is_string($value) ? mb_substr($value, 0, 200) : '';
+    }
+
+    $_SESSION['old'] = $old;
+    $_SESSION['errors'] = $errors;
+}
+
+// Returns [old values, field errors] once, so a refresh starts with a clean form.
+function pull_form(): array
+{
+    $old = $_SESSION['old'] ?? [];
+    $errors = $_SESSION['errors'] ?? [];
+    unset($_SESSION['old'], $_SESSION['errors']);
+
+    return [$old, $errors];
+}
+
 function redirect(string $location): void
 {
     header('Location: ' . $location);

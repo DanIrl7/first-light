@@ -11,43 +11,56 @@ verify_csrf();
 $name = trim((string) ($_POST['name'] ?? ''));
 $birthday = trim((string) ($_POST['birthday'] ?? ''));
 
+// One message per field, so the form can show each next to the box it belongs to.
+$errors = [];
+
 if ($name === '' || mb_strlen($name) > 80) {
-    set_flash('Please enter a name (up to 80 characters).');
-    redirect('index.php');
+    $errors['name'] = 'Please enter a name (up to 80 characters).';
 }
 
-$date = DateTimeImmutable::createFromFormat('!Y-m-d', $birthday);
 $earliest = new DateTimeImmutable('1940-01-01');
 $today = new DateTimeImmutable('today');
+$date = false;
 
-if ($date === false || $date->format('Y-m-d') !== $birthday || $date < $earliest || $date > $today) {
-    set_flash('Please pick a birthday between 1 January 1940 and today.');
-    redirect('index.php');
+if ($birthday === '') {
+    $errors['birthday'] = 'Choose your birthday from the calendar.';
+} else {
+    $date = DateTimeImmutable::createFromFormat('!Y-m-d', $birthday);
+
+    if ($date === false || $date->format('Y-m-d') !== $birthday) {
+        $errors['birthday'] = 'That date wasn\'t recognised. Please choose it from the calendar again.';
+    } elseif ($date < $earliest || $date > $today) {
+        $errors['birthday'] = 'Please pick a birthday between 1 January 1940 and today.';
+    }
 }
 
 // A place chosen from the suggestion list is used as-is. Otherwise, look up the typed city and country.
+$place = null;
+
 if (($_POST['place_latitude'] ?? '') !== '') {
     $place = place_from_selection($_POST);
 
     if ($place === null) {
-        set_flash('That place couldn\'t be read. Please choose it from the list again.');
-        redirect('index.php');
+        $errors['place'] = 'That place couldn\'t be read. Please choose it from the list again.';
     }
 } else {
     $city = trim((string) ($_POST['city'] ?? ''));
     $country = trim((string) ($_POST['country'] ?? ''));
 
     if ($city === '' || $country === '') {
-        set_flash('Please choose a birth place from the list, or enter a city and a country.');
-        redirect('index.php');
-    }
+        $errors['place'] = 'Please choose a birth place from the list, or enter a city and a country.';
+    } else {
+        $place = geocode_city($city, $country);
 
-    $place = geocode_city($city, $country);
-
-    if ($place === null) {
-        set_flash('We could not find "' . $city . '" in "' . $country . '". Check the spelling, or try a larger nearby city.');
-        redirect('index.php');
+        if ($place === null) {
+            $errors['place'] = 'We could not find "' . $city . '" in "' . $country . '". Check the spelling, or try a larger nearby city.';
+        }
     }
+}
+
+if ($errors !== []) {
+    remember_form($_POST, $errors);
+    redirect('index.php');
 }
 
 // Keep only what the next steps need. Name and birthday stay in the session, never in the URL.

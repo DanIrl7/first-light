@@ -219,6 +219,22 @@ button:active {
     font-size: 0.85rem;
 }
 
+/* A message under the field it belongs to. The field itself gets a warm red border. */
+.field-error {
+    margin: -0.5rem 0 0;
+    color: #ff9b85;
+    font-size: 0.9rem;
+}
+
+.field-error[hidden] {
+    display: none;
+}
+
+input[aria-invalid="true"],
+.date-picker-toggle[aria-invalid="true"] {
+    border-color: #ff9b85;
+}
+
 .flash {
     margin: 0 0 1.5rem;
     padding: 12px 16px;
