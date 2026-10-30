@@ -6,6 +6,81 @@
     overflow-x: clip;
 }
 
+/* The page background is the sky layer below, so the body itself is see-through. */
+body.page-day {
+    background: transparent;
+}
+
+/* Smooth scrolling (Lenis). These are the library's recommended rules. */
+html.lenis,
+html.lenis body {
+    height: auto;
+}
+
+.lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+}
+
+/* The sky: four layers that cross-fade as the page scrolls, matching the clock. Without JavaScript or with
+   reduced motion, only the dawn layer shows, as a still warm backdrop. */
+.sky {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.sky span {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    will-change: opacity;
+}
+
+.sky-night {
+    background:
+        radial-gradient(100% 70% at 50% 110%, #1b2347 0%, transparent 70%),
+        linear-gradient(#070a16, var(--bg));
+}
+
+.sky .sky-dawn {
+    opacity: 0.7;
+    background:
+        radial-gradient(110% 75% at 20% 105%, #6b3a2a 0%, #3a2030 40%, transparent 72%),
+        linear-gradient(#1a1220, var(--bg));
+}
+
+.sky-noon {
+    background:
+        radial-gradient(100% 70% at 50% 0%, #2a4452 0%, transparent 70%),
+        linear-gradient(#142029, var(--bg));
+}
+
+.sky-dusk {
+    background:
+        radial-gradient(110% 75% at 80% 105%, #7a3326 0%, #3d1f33 42%, transparent 72%),
+        linear-gradient(#1c1022, var(--bg));
+}
+
+/* A soft sun that crosses the sky. cinema.js positions it; out of sight until then. */
+.sky-orb {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 22vmin;
+    height: 22vmin;
+    margin: -11vmin 0 0 -11vmin;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(255, 214, 140, 0.55), rgba(228, 179, 99, 0.18) 55%, transparent 100%);
+    transform: translate3d(-100vw, 0, 0);
+    will-change: transform;
+}
+
+.sky-orb:not([style]) {
+    display: none;
+}
+
 .scene {
     position: relative;
     padding: clamp(88px, 16vh, 180px) var(--gutter);
@@ -270,6 +345,34 @@ img.is-broken {
 
 /* Events */
 
+/* The birth year, huge and outlined, behind the section heading. cinema.js slides it sideways. */
+.ghost {
+    position: absolute;
+    top: clamp(24px, 6vh, 72px);
+    left: 0;
+    right: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.ghost span {
+    display: block;
+    width: max-content;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(228, 179, 99, 0.22);
+    font-family: var(--font-display);
+    font-size: clamp(7rem, 22vw, 18rem);
+    font-weight: 800;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.scene-events > :not(.ghost) {
+    position: relative;
+    z-index: 1;
+}
+
 .event {
     display: grid;
     gap: clamp(20px, 4vw, 56px);
@@ -421,7 +524,7 @@ img.is-broken {
 /* Music */
 
 .scene-music {
-    background: linear-gradient(var(--bg), #120d08 40%, var(--bg));
+    background: linear-gradient(transparent, rgba(18, 13, 8, 0.72) 40%, transparent);
 }
 
 .song-title {
@@ -465,6 +568,24 @@ img.is-broken {
     inset: 10px;
     border: 1px solid rgba(228, 179, 99, 0.35);
     pointer-events: none;
+}
+
+/* The seal's strokes are drawn in by cinema.js (pathLength is 1, so a dash of 1 covers the whole line). */
+.seal {
+    display: block;
+    width: clamp(72px, 12vw, 104px);
+    margin: 0 auto 1.5rem;
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+}
+
+.seal path {
+    stroke-width: 3;
 }
 
 .certificate h2 {
@@ -582,6 +703,15 @@ img.is-broken {
 
     .certificate::before {
         border-color: #000;
+    }
+
+    .seal {
+        stroke: #000;
+    }
+
+    .sky,
+    .ghost {
+        display: none;
     }
 
     .certificate-text strong {

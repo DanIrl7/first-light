@@ -82,6 +82,14 @@ $videoId = $song !== null
     <script>document.documentElement.classList.add('js');</script>
 </head>
 <body class="page-day">
+    <div class="sky" aria-hidden="true">
+        <span class="sky-night"></span>
+        <span class="sky-dawn"></span>
+        <span class="sky-noon"></span>
+        <span class="sky-dusk"></span>
+        <i class="sky-orb"></i>
+    </div>
+
     <div class="progress" aria-hidden="true"><span></span></div>
 
     <div class="clock" aria-hidden="true">
@@ -114,7 +122,7 @@ $videoId = $song !== null
                 <div>
                     <p class="eyebrow" data-reveal>The place</p>
                     <?php if (!empty($day['city']['extract'])): ?>
-                        <p class="lede" data-reveal><?= e($day['city']['extract']) ?></p>
+                        <p class="lede" data-scrub><?= e($day['city']['extract']) ?></p>
                         <?php if ($cityUrl !== null): ?>
                             <p data-reveal><a href="<?= e($cityUrl) ?>" rel="noopener">Read more on Wikipedia</a></p>
                         <?php endif; ?>
@@ -162,6 +170,7 @@ $videoId = $song !== null
         </section>
 
         <section class="scene scene-events">
+            <div class="ghost" aria-hidden="true"><span><?= e($birthday->format('Y')) ?> · <?= e($birthday->format('Y')) ?> · <?= e($birthday->format('Y')) ?> · <?= e($birthday->format('Y')) ?></span></div>
             <p class="eyebrow">The world that day</p>
             <h2 data-split>What happened that day</h2>
             <p class="note" data-reveal>Events Wikipedia lists for this date in <?= e($birthday->format('Y')) ?>, in the order its monthly article gives them.</p>
@@ -256,8 +265,13 @@ $videoId = $song !== null
 
         <section class="scene scene-certificate">
             <div class="certificate">
+                <svg class="seal" viewBox="0 0 120 120" aria-hidden="true">
+                    <circle cx="60" cy="60" r="54" pathLength="1"/>
+                    <circle cx="60" cy="60" r="45" pathLength="1"/>
+                    <path d="M38 62 L54 78 L84 44" pathLength="1"/>
+                </svg>
                 <p class="eyebrow">Certificate of arrival</p>
-                <p class="certificate-text">
+                <p class="certificate-text" data-scrub>
                     This certifies that <strong><?= e($day['name']) ?></strong> arrived in
                     <strong><?= e($place['name']) ?></strong>, <?= e($place['country']) ?>,
                     on <strong><?= e($birthday->format('j F Y')) ?></strong>.
@@ -271,6 +285,7 @@ $videoId = $song !== null
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js"></script>
     <script src="assets/images.js"></script>
     <script src="assets/day.js"></script>
     <script src="assets/cinema.js"></script>
