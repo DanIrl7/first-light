@@ -302,7 +302,6 @@ $videoId = $song !== null
                     <strong><?= e($place['name']) ?></strong>, <?= e($place['country']) ?>,
                     on <strong><?= e($birthday->format('j F Y')) ?></strong>.
                 </p>
-                <button type="button" class="print-button" onclick="window.print()">Print certificate</button>
             </div>
         </section>
 

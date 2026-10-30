@@ -584,7 +584,7 @@ img.is-broken {
 }
 
 .certificate-text {
-    margin: 0 0 2rem;
+    margin: 0;
     font-family: var(--font-display);
     font-size: clamp(1.2rem, 2.4vw, 1.6rem);
     line-height: 1.5;
@@ -593,10 +593,6 @@ img.is-broken {
 .certificate-text strong {
     color: var(--accent);
     font-weight: 600;
-}
-
-.print-button {
-    justify-self: auto;
 }
 
 .admin-link {
@@ -666,45 +662,5 @@ img.is-broken {
 
     .scroll-cue {
         display: none;
-    }
-}
-
-@media print {
-    body {
-        background: #fff;
-        color: #000;
-    }
-
-    body::before,
-    .clock,
-    .progress,
-    .print-button,
-    .admin-link,
-    .scene:not(.scene-certificate) {
-        display: none;
-    }
-
-    .certificate {
-        border-color: #000;
-        background: none;
-        color: #000;
-        break-inside: avoid;
-    }
-
-    .certificate::before {
-        border-color: #000;
-    }
-
-    .seal {
-        stroke: #000;
-    }
-
-    .sky,
-    .ghost {
-        display: none;
-    }
-
-    .certificate-text strong {
-        color: #000;
     }
 }
