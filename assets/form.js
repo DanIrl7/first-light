@@ -118,6 +118,31 @@
             if (target) {
                 target.focus();
             }
+
+            return;
+        }
+
+        // Everything checks out: show that the form is being sent, and stop a second click from sending it twice.
+        const button = form.querySelector('button[type="submit"]');
+
+        if (button) {
+            button.classList.add('is-loading');
+            button.setAttribute('aria-busy', 'true');
+            button.textContent = 'Sending';
+            // Disabled after the event, so this submit still goes through.
+            setTimeout(() => (button.disabled = true), 0);
+        }
+    });
+
+    // Coming back with the Back button can restore the page as it was, with the button still busy.
+    window.addEventListener('pageshow', (event) => {
+        const button = form.querySelector('button[type="submit"]');
+
+        if (event.persisted && button) {
+            button.disabled = false;
+            button.classList.remove('is-loading');
+            button.removeAttribute('aria-busy');
+            button.textContent = 'Continue';
         }
     });
 

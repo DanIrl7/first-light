@@ -111,6 +111,11 @@
         }
 
         controller = new AbortController();
+        const mine = controller;
+
+        // Show that a search is running, so a slow connection doesn't look like nothing happened.
+        showMessage('Searching…');
+        search.setAttribute('aria-busy', 'true');
 
         const params = new URLSearchParams({ name: query, count: 8, language: 'en', format: 'json' });
 
@@ -128,6 +133,11 @@
             if (error.name !== 'AbortError') {
                 results = [];
                 showMessage('Search is unavailable right now. Please try again in a moment.');
+            }
+        } finally {
+            // A newer search has its own controller; only the latest one clears the busy state.
+            if (controller === mine) {
+                search.removeAttribute('aria-busy');
             }
         }
     }

@@ -231,6 +231,43 @@
     font-weight: 600;
 }
 
+/* Image loading: a shimmer in the frame until the photo arrives (images.js adds and removes the classes). */
+
+.event-media.is-loading,
+.person-photo.is-loading,
+.leader img.is-loading {
+    background: linear-gradient(100deg, var(--surface) 30%, #231e17 50%, var(--surface) 70%) 0 0 / 220% 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .event-media.is-loading,
+    .person-photo.is-loading,
+    .leader img.is-loading {
+        animation: shimmer 1.6s linear infinite;
+    }
+
+    .event-media img,
+    .hero-img {
+        transition: opacity 0.7s var(--ease-out);
+    }
+}
+
+@keyframes shimmer {
+    to {
+        background-position: -220% 0;
+    }
+}
+
+.event-media img.is-loading,
+.hero-img.is-loading {
+    opacity: 0;
+}
+
+/* A photo that couldn't load leaves a quiet empty frame instead of a broken-image icon. */
+img.is-broken {
+    visibility: hidden;
+}
+
 /* Events */
 
 .event {

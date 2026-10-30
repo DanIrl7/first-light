@@ -15,8 +15,20 @@
     const MAX_VOLUME = 80;
     const MIN_VOLUME = 50; // the quietest it gets, however far the section is scrolled away
 
+    const videoFrame = holder.closest('.video');
+
     let player = null;
     let playerReady = false;
+    let readyTimer = null;
+
+    // The frame shimmers until the video is actually playing (or it's clear it won't start by itself).
+    function markReady() {
+        clearTimeout(readyTimer);
+
+        if (videoFrame) {
+            videoFrame.classList.add('is-ready');
+        }
+    }
 
     function setStatus(text) {
         if (status) {
@@ -26,10 +38,14 @@
 
     function loadApi() {
         window.onYouTubeIframeAPIReady = createPlayer;
+        setStatus('Loading the music video…');
 
         const script = document.createElement('script');
         script.src = 'https://www.youtube.com/iframe_api';
-        script.onerror = () => setStatus('The music player couldn\'t load. Check your connection, or search for the song on YouTube.');
+        script.onerror = () => {
+            markReady();
+            setStatus('The music player couldn\'t load. Check your connection, or search for the song on YouTube.');
+        };
         document.head.appendChild(script);
     }
 
@@ -61,9 +77,25 @@
                     player.unloadModule('cc');
                     updateVolume();
                     player.playVideo();
-                    setStatus('Playing without sound. Click anywhere to turn it on.');
+                    setStatus('Starting the video…');
+
+                    // Some browsers won't start a video on their own. Don't leave the frame shimmering forever.
+                    readyTimer = setTimeout(() => {
+                        markReady();
+                        setStatus('The video is ready. Click "Turn on sound" to start it.');
+                    }, 6000);
+                },
+                onStateChange: (event) => {
+                    // 1 means playing.
+                    if (event.data === 1) {
+                        markReady();
+                        setStatus(button.hidden
+                            ? 'The video loops and gets quieter as you scroll away from it.'
+                            : 'Playing without sound. Click anywhere to turn it on.');
+                    }
                 },
                 onError: (event) => {
+                    markReady();
                     button.hidden = true;
                     console.warn('YouTube player error', event.data);
                     setStatus(errorMessage(event.data));
@@ -91,6 +123,8 @@
         }
 
         player.unMute();
+        // Also starts the video if the browser wouldn't let it begin on its own.
+        player.playVideo();
         button.hidden = true;
         setStatus('The video loops and gets quieter as you scroll away from it.');
         updateVolume();

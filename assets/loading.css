@@ -1,0 +1,191 @@
+/* Loading screen shown while the day is gathered. Tokens come from style.css. */
+
+.page-loading main {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    align-content: center;
+    min-height: 100svh;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 64px var(--gutter);
+    transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);
+}
+
+/* Fades away once everything is ready, just before the page changes. */
+.page-loading main.is-leaving {
+    opacity: 0;
+    transform: translateY(-12px);
+}
+
+.loading h1 {
+    margin: 0 0 1rem;
+    font-size: clamp(2.4rem, 8vw, 4.5rem);
+    line-height: 1;
+    font-weight: 800;
+}
+
+/* Three dots that cycle while the work is going on. */
+.dots::after {
+    content: "...";
+    display: inline-block;
+    width: 1.2em;
+    overflow: hidden;
+    vertical-align: bottom;
+    color: var(--accent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .dots::after {
+        animation: dots 1.4s steps(4, end) infinite;
+    }
+}
+
+@keyframes dots {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 1.2em;
+    }
+}
+
+.loading.is-done .dots,
+.loading.is-failed .dots {
+    display: none;
+}
+
+.loading .intro {
+    margin-bottom: 2rem;
+}
+
+/* The bar fills as steps finish. */
+.meter {
+    height: 3px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+    border-radius: 2px;
+    background: var(--border);
+}
+
+.meter span {
+    display: block;
+    height: 100%;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.7s var(--ease-out);
+}
+
+.steps {
+    display: grid;
+    gap: 0.9rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.steps li {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: var(--muted);
+    opacity: 0.55;
+    transition: opacity 0.4s var(--ease-out), color 0.4s var(--ease-out);
+}
+
+.steps .label {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+}
+
+.mark {
+    flex: none;
+    position: relative;
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    transition: background-color 0.3s var(--ease-out), border-color 0.3s var(--ease-out);
+}
+
+.steps li[data-state="active"] {
+    color: var(--text);
+    opacity: 1;
+}
+
+.steps li[data-state="active"] .mark {
+    border-color: var(--accent);
+    border-top-color: transparent;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .steps li[data-state="active"] .mark {
+        animation: spin 0.9s linear infinite;
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.steps li[data-state="done"] {
+    color: var(--text);
+    opacity: 0.8;
+}
+
+.steps li[data-state="done"] .mark {
+    border-color: var(--accent);
+    background: var(--accent);
+}
+
+/* A small tick drawn with borders, inside the filled circle. */
+.steps li[data-state="done"] .mark::after {
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 5px;
+    height: 9px;
+    border: solid var(--on-accent);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.loading-failed {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+    margin-top: 2rem;
+}
+
+.loading-failed[hidden] {
+    display: none;
+}
+
+.loading-failed p {
+    margin: 0;
+    color: #ff9b85;
+}
+
+/* Spoken updates for screen readers only. */
+.loading-live {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .meter span,
+    .page-loading main,
+    .steps li {
+        transition: none;
+    }
+}

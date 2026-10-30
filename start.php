@@ -70,4 +70,5 @@ $_SESSION['profile'] = [
     'place' => $place,
 ];
 
-redirect('result.php');
+// The loading screen gathers the day with visible progress, then moves on to result.php.
+redirect('loading.php');

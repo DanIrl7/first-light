@@ -18,6 +18,27 @@
     border: 0;
 }
 
+/* A shimmer over the frame until the video is playing. music.js adds .is-ready. */
+.video::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(100deg, #0d0b09 30%, #1d1812 50%, #0d0b09 70%) 0 0 / 220% 100%;
+    transition: opacity 0.8s var(--ease-out);
+    pointer-events: none;
+}
+
+.video.is-ready::before {
+    opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .video:not(.is-ready)::before {
+        animation: shimmer 1.6s linear infinite;
+    }
+}
+
 /* A clear layer over the player, so clicks can't open the video on YouTube. */
 .video::after {
     content: '';
