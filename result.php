@@ -66,6 +66,19 @@ $searchUrl = $song !== null
 $videoId = $song !== null
     ? (music_video_id($song['song'], $song['artist']) ?? youtube_embeddable_id($song['song'], $song['artist']))
     : null;
+
+// Sunrise and sunset as hours of the day (6.5 means 06:30), so the sky can turn at the real times.
+function clock_hours(?string $time): ?float
+{
+    return $time === null ? null : (int) substr($time, 0, 2) + (int) substr($time, 3, 2) / 60;
+}
+
+$weather = $day['weather'];
+$sunrise = clock_hours($weather['sunrise'] ?? null);
+$sunset = clock_hours($weather['sunset'] ?? null);
+$numbers = $day['numbers'];
+$tenThousandth = new DateTimeImmutable($numbers['ten_thousandth']['date']);
+$tenThousandthAway = $numbers['ten_thousandth']['days_away'];
 ?>
 <!doctype html>
 <html lang="en"<?= $videoId !== null ? ' class="has-gate"' : '' ?>>
@@ -106,7 +119,7 @@ $videoId = $song !== null
         </button>
     <?php endif; ?>
 
-    <div class="sky" aria-hidden="true">
+    <div class="sky" aria-hidden="true"<?= $sunrise !== null && $sunset !== null && $sunrise < $sunset ? ' data-sunrise="' . e((string) round($sunrise, 3)) . '" data-sunset="' . e((string) round($sunset, 3)) . '"' : '' ?>>
         <span class="sky-night"></span>
         <span class="sky-dawn"></span>
         <span class="sky-noon"></span>
@@ -168,6 +181,24 @@ $videoId = $song !== null
                             °C · <?= e($day['weather']['condition']) ?>
                             <span class="meta">at <?= e($day['weather']['time']) ?></span>
                         </p>
+                        <?php
+                        $w = $day['weather'];
+                        $facts = array_filter([
+                            'High' => isset($w['high_c']) ? number_format((float) $w['high_c'], 1) . ' °C' : null,
+                            'Low' => isset($w['low_c']) ? number_format((float) $w['low_c'], 1) . ' °C' : null,
+                            'Rain' => isset($w['rain_mm']) ? ($w['rain_mm'] > 0 ? number_format((float) $w['rain_mm'], 1) . ' mm' : 'None') : null,
+                            'Wind' => isset($w['wind_kmh']) ? 'Up to ' . number_format((float) $w['wind_kmh'], 0) . ' km/h' : null,
+                            'Sunrise' => $w['sunrise'] ?? null,
+                            'Sunset' => $w['sunset'] ?? null,
+                        ], fn ($value) => $value !== null);
+                        ?>
+                        <?php if ($facts !== []): ?>
+                            <dl class="weather-facts">
+                                <?php foreach ($facts as $label => $value): ?>
+                                    <div><dt><?= e($label) ?></dt><dd><?= e($value) ?></dd></div>
+                                <?php endforeach; ?>
+                            </dl>
+                        <?php endif; ?>
                     <?php else: ?>
                         <p class="meta">The weather records for this day didn't survive the trip.</p>
                     <?php endif; ?>
@@ -192,6 +223,49 @@ $videoId = $song !== null
                     </div>
                 </div>
             <?php endif; ?>
+        </section>
+
+        <section class="scene scene-numbers">
+            <p class="eyebrow">The readout</p>
+            <h2 data-split>Your day in numbers</h2>
+            <p class="note" data-reveal>What the machine's dials say about <?= e($birthday->format('j F Y')) ?>.</p>
+
+            <div class="stats">
+                <div class="stat" data-reveal>
+                    <span class="stat-label">You landed on a</span>
+                    <span class="stat-value"><?= e($numbers['weekday']) ?></span>
+                </div>
+                <div class="stat" data-reveal>
+                    <span class="stat-label">Star sign</span>
+                    <span class="stat-value"><?= e($numbers['star_sign']) ?></span>
+                </div>
+                <div class="stat" data-reveal>
+                    <span class="stat-label">Chinese zodiac</span>
+                    <span class="stat-value">Year of the <?= e($numbers['chinese_zodiac']) ?></span>
+                </div>
+                <div class="stat" data-reveal>
+                    <span class="stat-label">The moon that night</span>
+                    <span class="stat-value"><?= e($numbers['moon']['name']) ?></span>
+                    <span class="stat-note"><?= e((string) $numbers['moon']['lit']) ?>% lit</span>
+                </div>
+                <div class="stat stat-wide" data-reveal>
+                    <span class="stat-label">Days since you arrived</span>
+                    <span class="stat-value stat-big" data-count="<?= e((string) $numbers['days_alive']) ?>" data-group="1"><?= e(number_format($numbers['days_alive'])) ?></span>
+                </div>
+                <div class="stat stat-wide" data-reveal>
+                    <span class="stat-label">Your 10,000th day</span>
+                    <span class="stat-value"><?= e($tenThousandth->format('j F Y')) ?></span>
+                    <span class="stat-note">
+                        <?php if ($tenThousandthAway > 0): ?>
+                            That's <?= e(number_format($tenThousandthAway)) ?> days from now. Mark the calendar.
+                        <?php elseif ($tenThousandthAway === 0): ?>
+                            That's today. Happy 10,000th!
+                        <?php else: ?>
+                            You passed it <?= e(number_format(abs($tenThousandthAway))) ?> days ago.
+                        <?php endif; ?>
+                    </span>
+                </div>
+            </div>
         </section>
 
         <section class="scene scene-events">
@@ -261,6 +335,57 @@ $videoId = $song !== null
             <?php endif; ?>
         </section>
 
+        <section class="scene scene-also">
+            <p class="eyebrow">Same date, other years</p>
+            <h2 data-split>Also on this day</h2>
+
+            <?php if ($day['also']['deaths'] === [] && $day['also']['holidays'] === []): ?>
+                <p class="meta">The calendar pages for this date came loose in the trip. Try the machine again later.</p>
+            <?php endif; ?>
+
+            <div class="also-grid">
+                <?php if ($day['also']['deaths'] !== []): ?>
+                    <div class="also-block" data-reveal>
+                        <p class="eyebrow">Gone on this day</p>
+                        <ul class="also-list">
+                            <?php foreach ($day['also']['deaths'] as $person): ?>
+                                <li>
+                                    <span class="also-year"><?= e(year_label($person['year'] ?? null)) ?></span>
+                                    <span class="also-body">
+                                        <?php if (safe_url($person['url'] ?? null) !== null): ?>
+                                            <a href="<?= e(safe_url($person['url'])) ?>" rel="noopener"><?= e($person['name']) ?></a>
+                                        <?php else: ?>
+                                            <strong><?= e($person['name']) ?></strong>
+                                        <?php endif; ?>
+                                        <?php if (!empty($person['known_for'])): ?>
+                                            <span class="meta"><?= e(ucfirst($person['known_for'])) ?></span>
+                                        <?php endif; ?>
+                                    </span>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($day['also']['holidays'] !== []): ?>
+                    <div class="also-block" data-reveal>
+                        <p class="eyebrow">On the calendar</p>
+                        <ul class="also-list also-holidays">
+                            <?php foreach ($day['also']['holidays'] as $holiday): ?>
+                                <li>
+                                    <?php if (safe_url($holiday['url'] ?? null) !== null): ?>
+                                        <a href="<?= e(safe_url($holiday['url'])) ?>" rel="noopener"><?= e($holiday['text']) ?></a>
+                                    <?php else: ?>
+                                        <?= e($holiday['text']) ?>
+                                    <?php endif; ?>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </section>
+
         <section class="scene scene-music" id="music" data-video-id="<?= e($videoId ?? '') ?>">
             <p class="eyebrow">The soundtrack</p>
             <h2 data-split>The top song that week</h2>
@@ -284,6 +409,28 @@ $videoId = $song !== null
                 <?php endif; ?>
             <?php else: ?>
                 <p class="meta">The Billboard Hot 100 only starts in 1958, so there's no chart song waiting for you on this date.</p>
+            <?php endif; ?>
+        </section>
+
+        <section class="scene scene-milestones">
+            <p class="eyebrow">Fast-forward</p>
+            <h2 data-split>Growing up on the charts</h2>
+
+            <?php if ($day['milestones'] === []): ?>
+                <p class="meta">The machine only visits birthdays that have already happened, and its chart begins in 1958. No stops to make here yet.</p>
+            <?php else: ?>
+                <p class="note" data-reveal>The number one song on the Billboard Hot 100 each time your birthday came around.</p>
+                <div class="milestones">
+                    <?php foreach ($day['milestones'] as $stop): ?>
+                        <article class="milestone" data-reveal>
+                            <span class="milestone-age"><?= e((string) $stop['age']) ?></span>
+                            <p class="milestone-date"><?= e((new DateTimeImmutable($stop['date']))->format('j F Y')) ?></p>
+                            <p class="milestone-song">"<?= e($stop['song']) ?>"</p>
+                            <p class="meta">by <?= e($stop['artist']) ?></p>
+                            <p><a href="https://www.youtube.com/results?search_query=<?= e(rawurlencode($stop['song'] . ' ' . $stop['artist'])) ?>" rel="noopener">Find it on YouTube</a></p>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
             <?php endif; ?>
         </section>
 

@@ -38,6 +38,40 @@ function billboard_number_one_on(DateTimeImmutable $date): ?array
     ];
 }
 
+// The number one song on the birthdays that mark growing up. An age is skipped when that birthday is still
+// in the future or falls before the chart starts, so the list can be empty.
+// Returns [['age' => 13, 'date' => 'Y-m-d', 'song' => ..., 'artist' => ..., 'chart_date' => ...], ...].
+function billboard_milestones(DateTimeImmutable $birthday, ?DateTimeImmutable $today = null, array $ages = [13, 16, 18, 21]): array
+{
+    $today ??= new DateTimeImmutable('today');
+    $milestones = [];
+
+    foreach ($ages as $age) {
+        $year = (int) $birthday->format('Y') + $age;
+        $month = (int) $birthday->format('n');
+        $day = (int) $birthday->format('j');
+
+        // A 29 February birthday has no such day in most years, so use the 28th.
+        if (!checkdate($month, $day, $year)) {
+            $day = 28;
+        }
+
+        $date = new DateTimeImmutable(sprintf('%04d-%02d-%02d', $year, $month, $day));
+
+        if ($date > $today || $year < 1958) {
+            continue;
+        }
+
+        $song = billboard_number_one_on($date);
+
+        if ($song !== null) {
+            $milestones[] = ['age' => $age, 'date' => $date->format('Y-m-d')] + $song;
+        }
+    }
+
+    return $milestones;
+}
+
 // Removes footnote symbols and stray quotes that Billboard's tables include, e.g. "Uptown Funk" †
 // Applied on read, so rows cached before this fix are cleaned too.
 function clean_chart_text(string $text): string

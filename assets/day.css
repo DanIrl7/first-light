@@ -536,6 +536,174 @@ img.is-broken {
     background: #000;
 }
 
+/* Weather facts under the temperature */
+
+.weather-facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+    gap: 1rem 1.5rem;
+    margin: 1.5rem 0 0;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+}
+
+.weather-facts dt {
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.weather-facts dd {
+    margin: 0.2rem 0 0;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Your day in numbers */
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: clamp(14px, 2vw, 24px);
+}
+
+.stat {
+    display: grid;
+    align-content: start;
+    gap: 0.4rem;
+    padding: clamp(20px, 3vw, 32px);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+}
+
+.stat-label {
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.stat-big {
+    color: var(--accent);
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+.stat-note {
+    color: var(--muted);
+}
+
+@media (min-width: 900px) {
+    .stat-wide {
+        grid-column: span 2;
+    }
+}
+
+/* Also on this day */
+
+.also-grid {
+    display: grid;
+    gap: clamp(32px, 6vw, 96px);
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 900px) {
+    .also-grid {
+        grid-template-columns: 1.4fr 1fr;
+    }
+}
+
+.also-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.also-list li {
+    display: flex;
+    gap: 1.25rem;
+    padding: 0.9rem 0;
+    border-top: 1px solid var(--border);
+}
+
+.also-year {
+    flex: 0 0 4.5rem;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.also-body {
+    display: grid;
+    gap: 0.2rem;
+}
+
+.also-body strong,
+.also-body a {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+}
+
+.also-holidays li {
+    display: block;
+}
+
+/* Growing up on the charts */
+
+.milestones {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    gap: clamp(20px, 3vw, 40px);
+}
+
+.milestone {
+    padding-top: 1rem;
+    border-top: 1px solid var(--accent);
+}
+
+.milestone p {
+    margin: 0 0 0.5rem;
+}
+
+.milestone-age {
+    display: block;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--accent);
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 9vw, 7rem);
+    font-weight: 800;
+    line-height: 1;
+}
+
+.milestone-date {
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.milestone-song {
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+    font-style: italic;
+    line-height: 1.15;
+}
+
 /* Certificate */
 
 .scene-certificate {

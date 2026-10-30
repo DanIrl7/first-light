@@ -1,11 +1,14 @@
 <?php
 declare(strict_types=1);
 
-// Weather at 12:00 local time on a date, from the Open-Meteo historical archive (1940 onward).
+// Weather at 12:00 local time on a date, plus the day's high, low, rain, wind and sunrise and sunset,
+// from the Open-Meteo historical archive (1940 onward).
 // Returns null if the archive doesn't have that day yet (very recent dates).
+// The day's totals and sun times are null when the archive leaves them out (the sun may not rise or set near the poles).
 function weather_at_noon(float $latitude, float $longitude, string $date, string $timezone): ?array
 {
-    $key = sprintf('weather:%.3f:%.3f:%s', $latitude, $longitude, $date);
+    // The key is versioned: entries cached before the daily figures existed hold only the noon reading.
+    $key = sprintf('weather-v2:%.3f:%.3f:%s', $latitude, $longitude, $date);
 
     return cache_remember($key, app_config()['cache_ttl']['weather'], function () use ($latitude, $longitude, $date, $timezone) {
         $data = http_get_json('https://archive-api.open-meteo.com/v1/archive?' . http_build_query([
@@ -14,6 +17,7 @@ function weather_at_noon(float $latitude, float $longitude, string $date, string
             'start_date' => $date,
             'end_date' => $date,
             'hourly' => 'temperature_2m,weather_code',
+            'daily' => 'temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max,sunrise,sunset',
             'timezone' => $timezone,
         ]));
 
@@ -31,10 +35,21 @@ function weather_at_noon(float $latitude, float $longitude, string $date, string
             return null;
         }
 
+        $daily = $data['daily'] ?? [];
+        $number = fn (string $field) => isset($daily[$field][0]) ? round((float) $daily[$field][0], 1) : null;
+        // Open-Meteo gives local times like "2004-06-01T05:12"; the page only needs the clock part.
+        $clock = fn (string $field) => isset($daily[$field][0]) && preg_match('/T(\d{2}:\d{2})$/', (string) $daily[$field][0], $match) ? $match[1] : null;
+
         return [
             'temperature_c' => round((float) $temperature, 1),
             'condition' => wmo_condition((int) $code),
             'time' => '12:00 local time',
+            'high_c' => $number('temperature_2m_max'),
+            'low_c' => $number('temperature_2m_min'),
+            'rain_mm' => $number('precipitation_sum'),
+            'wind_kmh' => $number('wind_speed_10m_max'),
+            'sunrise' => $clock('sunrise'),
+            'sunset' => $clock('sunset'),
         ];
     });
 }

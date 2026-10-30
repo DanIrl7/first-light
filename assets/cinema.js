@@ -85,37 +85,63 @@
             });
         }
 
-        // The sky behind the page follows the clock: night at the top, dawn at 06:00, bright at noon,
-        // dusk at 18:00, and night again at the bottom. Layers cross-fade, which keeps scrolling smooth.
-        if (document.querySelector('.sky')) {
+        // The sky behind the page follows the clock: night at the top, dawn at sunrise, bright at midday,
+        // dusk at sunset, and night again at the bottom. Layers cross-fade, which keeps scrolling smooth.
+        // The real sunrise and sunset of the birth place come from the page (data-sunrise, data-sunset, in hours);
+        // without them the sun rises at 06:00 and sets at 18:00.
+        const skyEl = document.querySelector('.sky');
+
+        if (skyEl) {
+            const rise = parseFloat(skyEl.dataset.sunrise);
+            const set = parseFloat(skyEl.dataset.sunset);
+            const known = rise > 0 && set > rise && set < 24;
+            const sunrise = known ? rise : 6;
+            const sunset = known ? set : 18;
+            const midday = (sunrise + sunset) / 2;
+
             // Midnight at the top of the page.
             gsap.set('.sky-night', { opacity: 1 });
             gsap.set('.sky-dawn, .sky-noon, .sky-dusk', { opacity: 0 });
 
             const sky = gsap.timeline({
-                defaults: { ease: 'none', duration: 1 },
+                defaults: { ease: 'none' },
                 scrollTrigger: { start: 0, end: 'max', scrub: 0.8, refreshPriority: 99 },
             });
 
-            // One unit of the timeline is six hours of the day.
+            // One unit of the timeline is one hour of the day. Each layer peaks at its own moment.
             sky
-                .to('.sky-night', { opacity: 0 }, 0)
-                .to('.sky-dawn', { opacity: 1 }, 0)
-                .to('.sky-dawn', { opacity: 0 }, 1)
-                .to('.sky-noon', { opacity: 1 }, 1)
-                .to('.sky-noon', { opacity: 0 }, 2)
-                .to('.sky-dusk', { opacity: 1 }, 2)
-                .to('.sky-dusk', { opacity: 0 }, 3)
-                .to('.sky-night', { opacity: 1 }, 3);
+                .to('.sky-night', { opacity: 0, duration: sunrise }, 0)
+                .to('.sky-dawn', { opacity: 1, duration: sunrise }, 0)
+                .to('.sky-dawn', { opacity: 0, duration: midday - sunrise }, sunrise)
+                .to('.sky-noon', { opacity: 1, duration: midday - sunrise }, sunrise)
+                .to('.sky-noon', { opacity: 0, duration: sunset - midday }, midday)
+                .to('.sky-dusk', { opacity: 1, duration: sunset - midday }, midday)
+                .to('.sky-dusk', { opacity: 0, duration: 24 - sunset }, sunset)
+                .to('.sky-night', { opacity: 1, duration: 24 - sunset }, sunset);
 
-            // The sun climbs from the left horizon at 06:00, tops out at noon and sets on the right at 18:00.
+            // The sun climbs from the left horizon at sunrise, tops out at midday and sets on the right at sunset.
             const orb = document.querySelector('.sky-orb');
 
             if (orb) {
                 const setX = gsap.quickSetter(orb, 'x', 'px');
                 const setY = gsap.quickSetter(orb, 'y', 'px');
+                // Page progress to a turn of the sun's circle: sunrise is a quarter turn, sunset three quarters.
+                const night = 24 - sunset + sunrise;
+                const turn = (progress) => {
+                    const hour = progress * 24;
+
+                    if (hour < sunrise) {
+                        return 0.25 - 0.5 * (sunrise - hour) / night;
+                    }
+
+                    if (hour > sunset) {
+                        return 0.75 + 0.5 * (hour - sunset) / night;
+                    }
+
+                    return 0.25 + 0.5 * (hour - sunrise) / (sunset - sunrise);
+                };
                 const place = (progress) => {
-                    const angle = (progress - 0.5) * Math.PI * 2;
+                    const angle = (turn(progress) - 0.5) * Math.PI * 2;
                     setX(window.innerWidth * (0.5 + 0.58 * Math.sin(angle)));
                     setY(window.innerHeight * (1.05 - 0.78 * Math.cos(angle)));
                 };
@@ -208,24 +234,26 @@
             });
         }
 
-        // The temperature counts up to its value.
-        const temp = document.querySelector('[data-count]');
-
-        if (temp) {
-            const target = parseFloat(temp.dataset.count);
-            const decimals = parseInt(temp.dataset.decimals || '0', 10);
+        // Numbers marked data-count (the temperature, the days alive) count up to their value.
+        // data-group adds thousands separators.
+        gsap.utils.toArray('[data-count]').forEach((el) => {
+            const target = parseFloat(el.dataset.count);
+            const decimals = parseInt(el.dataset.decimals || '0', 10);
             const counter = { value: 0 };
+            const format = el.dataset.group
+                ? (value) => Math.round(value).toLocaleString('en-US')
+                : (value) => value.toFixed(decimals);
 
             gsap.to(counter, {
                 value: target,
                 duration: 1.8,
                 ease: 'power2.out',
                 onUpdate: () => {
-                    temp.textContent = counter.value.toFixed(decimals);
+                    el.textContent = format(counter.value);
                 },
-                scrollTrigger: { trigger: temp, start: 'top 85%', once: true },
+                scrollTrigger: { trigger: el, start: 'top 85%', once: true },
             });
-        }
+        });
 
         // The birth year, drawn huge and outlined, slides sideways behind the events as you scroll.
         const ghost = document.querySelector('.ghost span');

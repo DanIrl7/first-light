@@ -104,9 +104,25 @@ function https_url(?string $url): ?string
 // The most famous people born on this month and day, ranked by Wikidata sitelinks.
 function wiki_top_people(int $month, int $day, int $count = 5): array
 {
+    return array_map(function ($person) {
+        $person['born_year'] = $person['year'];
+
+        return $person;
+    }, wiki_ranked_people('births', $month, $day, $count));
+}
+
+// The most famous people who died on this month and day, ranked the same way.
+function wiki_top_deaths(int $month, int $day, int $count = 4): array
+{
+    return wiki_ranked_people('deaths', $month, $day, $count);
+}
+
+// People from the births or deaths feed, most widely covered first. 'year' is the year of the birth or death.
+function wiki_ranked_people(string $kind, int $month, int $day, int $count): array
+{
     $candidates = [];
 
-    foreach (wiki_feed('births', $month, $day) as $item) {
+    foreach (wiki_feed($kind, $month, $day) as $item) {
         $page = $item['pages'][0] ?? null;
         $id = $page['wikibase_item'] ?? null;
 
@@ -134,7 +150,7 @@ function wiki_top_people(int $month, int $day, int $count = 5): array
     foreach (array_slice($ranked, 0, $count) as [$entity, $candidate]) {
         $people[] = [
             'name' => $entity['label'],
-            'born_year' => $candidate['year'],
+            'year' => $candidate['year'],
             'known_for' => $entity['description'],
             'birthplace' => $entity['birthplace'],
             'image' => https_url($entity['image'] ?? ($candidate['page']['thumbnail']['source'] ?? null)),
@@ -143,6 +159,36 @@ function wiki_top_people(int $month, int $day, int $count = 5): array
     }
 
     return $people;
+}
+
+// Holidays and observances for this month and day, in the order the feed lists them: [['text' => ..., 'url' => ...], ...].
+// Not ranked through Wikidata, which would add a slow query for little gain.
+function wiki_top_holidays(int $month, int $day, int $count = 6): array
+{
+    $picked = [];
+    $feasts = 0;
+
+    foreach (wiki_feed('holidays', $month, $day) as $item) {
+        // The feed puts a line break after labels like "Christian feast day:".
+        $text = trim(preg_replace('/\s+/', ' ', (string) ($item['text'] ?? '')));
+
+        if ($text === '') {
+            continue;
+        }
+
+        // Saints' feast days crowd out everything else on most dates, so keep two of them and fill the rest with other observances.
+        if (stripos($text, 'feast') !== false && ++$feasts > 2) {
+            continue;
+        }
+
+        $picked[] = ['text' => $text, 'url' => $item['pages'][0]['content_urls']['desktop']['page'] ?? null];
+
+        if (count($picked) === $count) {
+            break;
+        }
+    }
+
+    return $picked;
 }
 
 // Events Wikipedia lists for one date in one year, taken from that month's article (e.g. "January 1960").

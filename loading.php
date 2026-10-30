@@ -17,10 +17,12 @@ if (empty($_SESSION['csrf'])) {
 $steps = [
     'city' => 'Plotting a course to ' . $profile['place']['name'],
     'leaders' => 'Finding out who was running the place',
-    'weather' => 'Checking the sky at noon',
+    'weather' => 'Checking the sky, from sunrise to sunset',
     'song' => 'Tuning the radio to the number one song',
+    'milestones' => 'Fast-forwarding through your growing-up years',
     'people' => 'Rounding up your birthday twins',
     'events' => 'Skimming the day\'s headlines',
+    'also' => 'Seeing who else dropped by that day',
     'video' => 'Cueing the soundtrack',
 ];
 ?>
