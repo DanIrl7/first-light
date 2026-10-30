@@ -16,7 +16,7 @@ function geocode_city(string $city, string $country): ?array
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_TIMEOUT => 10,
-        CURLOPT_USERAGENT => 'BornHere/0.1 (portfolio project)',
+        CURLOPT_USERAGENT => 'FirstLight/0.1 (portfolio project)',
     ]);
 
     $body = curl_exec($ch);

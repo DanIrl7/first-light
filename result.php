@@ -72,10 +72,10 @@ $videoId = $song !== null
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Born Here · <?= e($day['name']) ?></title>
+    <title>First Light · <?= e($day['name']) ?></title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Playfair+Display:ital,wght@0,400;0,700;0,800;1,400;1,600&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&amp;family=Fraunces:ital,wght@0,400;0,700;0,800;1,400;1,600&amp;family=Manrope:wght@300;400;500;600&amp;display=swap">
     <link rel="stylesheet" href="assets/style.css">
     <link rel="stylesheet" href="assets/day.css">
     <link rel="stylesheet" href="assets/music.css">
@@ -134,7 +134,7 @@ $videoId = $song !== null
             <?php endif; ?>
 
             <div class="hero-copy">
-                <p class="eyebrow">Born here</p>
+                <p class="eyebrow">Where it began</p>
                 <h1 data-split><?= e($day['name']) ?>, you arrived in <em><?= e($place['name']) ?></em>.</h1>
                 <p class="meta">
                     <?= e($birthday->format('j F Y')) ?> · <?= e($region . $place['country']) ?>

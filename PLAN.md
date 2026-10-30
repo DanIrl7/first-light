@@ -1,4 +1,4 @@
-# Born Here: project plan
+# First Light: project plan
 
 A scroll-driven PHP site that takes a person's name, birthday, and birth city, then tells the story of the world on the day they were born.
 

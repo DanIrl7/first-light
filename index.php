@@ -27,10 +27,10 @@ if ($placeText === '' && old_value($old, 'place_latitude') !== '') {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Born Here</title>
+    <title>First Light</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Playfair+Display:ital,wght@0,400;0,700;0,800;1,400;1,600&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&amp;family=Fraunces:ital,wght@0,400;0,700;0,800;1,400;1,600&amp;family=Manrope:wght@300;400;500;600&amp;display=swap">
     <link rel="stylesheet" href="assets/style.css">
     <link rel="stylesheet" href="assets/calendar.css">
     <link rel="stylesheet" href="assets/places.css">
@@ -42,7 +42,7 @@ if ($placeText === '' && old_value($old, 'place_latitude') !== '') {
 
     <main>
         <p class="eyebrow" data-intro>A scroll through your first day</p>
-        <h1 data-intro>Born <em>Here</em></h1>
+        <h1 data-intro>First <em>Light</em></h1>
         <p class="intro" data-intro>Enter your details to see what the world looked like the day you were born.</p>
 
         <?php if ($flash !== null): ?>

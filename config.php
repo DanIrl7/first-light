@@ -15,7 +15,7 @@ return [
     ],
 
     // Wikimedia asks API clients to identify themselves with a descriptive User-Agent.
-    'user_agent' => 'BornHere/0.1 (https://github.com/DanIrl7; portfolio project)',
+    'user_agent' => 'FirstLight/0.1 (https://github.com/DanIrl7; portfolio project)',
 
     // YouTube Data API key. Set the YOUTUBE_API_KEY environment variable, never commit the key.
     // While it's empty, songs without a video in data/videos.csv keep the search link.

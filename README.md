@@ -1,6 +1,6 @@
-# Born Here
+# First Light
 
-Enter your name, birthday, and birth city, and get a scroll-driven page about the day you were born: the city and its weather at 12:00, the most notable events and people born that day, the top US chart song that week with a looping video, and a printable certificate.
+Enter your name, birthday, and birth city, and get a scroll-driven page about the day you were born: the city and its weather at 12:00, the most notable events and people born that day, the top US chart song that week with a looping video, and a certificate of arrival.
 
 Live at https://born-here.onrender.com
 
