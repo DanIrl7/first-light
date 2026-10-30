@@ -7,9 +7,9 @@ Live at https://born-here.onrender.com (the address comes from the Render servic
 ## Features
 
 - **Input:** name, birthday (from 1 January 1940), and birth place. The place is picked from a suggestion list, so cities with the same name are told apart. There's a visible calendar for the birthday, and a fallback city and country field if the list isn't available. If a submit fails, every field keeps what was typed and each error shows under its field.
-- **Randomize the day:** a button on the form fills in a random date (from 1958, so there's always a chart song) and a random well-known city. The visitor only adds a name.
+- **Surprise me!:** a button on the form fills in a random date (from 1958, so there's always a chart song) and a random well-known city. The visitor only adds a name. There is another at the bottom of the day page, which keeps the name and starts a new random day.
 - **Loading screen:** the first time a day is built, a screen shows each step (city, leaders, weather, song, people, events, video) as it finishes, with a retry if something fails.
-- **Click to begin:** the day page opens behind a cover while the music video loads. The button unlocks once the video is playing. If that takes more than 30 seconds, or the video can't load, "Continue without sound" appears. The click is what lets the browser play sound.
+- **Open the hatch:** the day page opens behind a cover while the music video loads. The button unlocks once the video is playing. If that takes more than 30 seconds, or the video can't load, "Step out without sound" appears. The click is what lets the browser play sound.
 - **Music:** the Billboard Hot 100 number one in effect that week. It plays all the way down the page, a little quieter away from its own section, and a button in the corner turns it on and off. The video loops and requests 720p.
 - **City and weather:** a Wikipedia summary and image for the city, plus the weather at 12:00 local time on the birth date.
 - **Leaders:** the head of state and head of government of the birth country on that day.

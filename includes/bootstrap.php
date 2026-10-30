@@ -27,7 +27,7 @@ function verify_csrf(): void
 
     if (!is_string($sent) || $expected === '' || !hash_equals($expected, $sent)) {
         http_response_code(403);
-        exit('Your form expired. Go back, refresh the page, and try again.');
+        exit('That launch window closed. Go back, refresh the page, and try again.');
     }
 }
 

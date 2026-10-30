@@ -2,7 +2,7 @@
 require __DIR__ . '/includes/bootstrap.php';
 
 if (empty($_SESSION['profile'])) {
-    set_flash('Enter your details first.');
+    set_flash('The machine needs coordinates first. Fill in the form to begin.');
     redirect('/');
 }
 
@@ -15,13 +15,13 @@ if (empty($_SESSION['csrf'])) {
 
 // Each step matches one that build.php reports. The text names what is being looked up.
 $steps = [
-    'city' => 'Finding ' . $profile['place']['name'],
-    'leaders' => 'Asking who was in charge',
-    'weather' => 'Checking the weather at noon',
-    'song' => 'Finding the number one song',
-    'people' => 'Gathering people born that day',
-    'events' => 'Reading what happened',
-    'video' => 'Cueing the music video',
+    'city' => 'Plotting a course to ' . $profile['place']['name'],
+    'leaders' => 'Finding out who was running the place',
+    'weather' => 'Checking the sky at noon',
+    'song' => 'Tuning the radio to the number one song',
+    'people' => 'Rounding up your birthday twins',
+    'events' => 'Skimming the day\'s headlines',
+    'video' => 'Cueing the soundtrack',
 ];
 ?>
 <!doctype html>
@@ -29,7 +29,7 @@ $steps = [
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Developing your day · First Light</title>
+    <title>Warming up the time machine · First Light</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&amp;family=Fraunces:ital,wght@0,400;0,700;0,800;1,400;1,600&amp;family=Manrope:wght@300;400;500;600&amp;display=swap">
@@ -44,10 +44,10 @@ $steps = [
 
     <main class="loading" data-csrf="<?= e($_SESSION['csrf']) ?>" data-total="<?= count($steps) ?>">
         <p class="eyebrow"><?= e($profile['place']['name']) ?> · <?= e($birthday->format('j F Y')) ?></p>
-        <h1 id="loading-title">Developing your day<span class="dots" aria-hidden="true"></span></h1>
-        <p class="intro" id="loading-note">The first time a day is looked up it can take a minute. After that it's quick.</p>
+        <h1 id="loading-title">Warming up the time machine<span class="dots" aria-hidden="true"></span></h1>
+        <p class="intro" id="loading-note">A brand-new destination can take a minute to chart. Places the machine has been before are almost instant.</p>
 
-        <div class="meter" role="progressbar" aria-label="Gathering your day" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="loading-meter">
+        <div class="meter" role="progressbar" aria-label="Time machine progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="loading-meter">
             <span id="loading-bar"></span>
         </div>
 
@@ -62,8 +62,8 @@ $steps = [
 
         <div class="loading-failed" id="loading-failed" hidden>
             <p id="loading-error" role="alert"></p>
-            <button type="button" id="loading-retry">Try again</button>
-            <a href="/">Back to the form</a>
+            <button type="button" id="loading-retry">Fire it up again</button>
+            <a href="/">Back to the controls</a>
         </div>
     </main>
 

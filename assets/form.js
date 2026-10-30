@@ -20,11 +20,11 @@
         const value = birthday.value;
 
         if (value === '') {
-            return 'Choose your birthday from the calendar.';
+            return 'Pick a date on the calendar to set the dials.';
         }
 
         if (value < birthday.min || value > birthday.max) {
-            return 'Please pick a birthday between 1 January 1940 and today.';
+            return 'That\'s outside the machine\'s range. Pick a date between 1 January 1940 and today.';
         }
 
         return null;
@@ -37,7 +37,7 @@
 
         return search.value.trim() === ''
             ? 'Start typing a city, then pick it from the list.'
-            : 'Pick your birth place from the list that appears as you type.';
+            : 'Pick your city from the list that appears as you type.';
     }
 
     const checks = [
@@ -45,7 +45,7 @@
             key: 'name',
             input: nameInput,
             focus: () => nameInput,
-            problem: () => (nameInput.value.trim() === '' ? 'Please enter a name.' : null),
+            problem: () => (nameInput.value.trim() === '' ? 'The logbook needs a name.' : null),
         },
         {
             key: 'birthday',
@@ -128,7 +128,7 @@
         if (button) {
             button.classList.add('is-loading');
             button.setAttribute('aria-busy', 'true');
-            button.textContent = 'Sending';
+            button.textContent = 'Powering up';
             // Disabled after the event, so this submit still goes through.
             setTimeout(() => (button.disabled = true), 0);
         }
@@ -142,7 +142,7 @@
             button.disabled = false;
             button.classList.remove('is-loading');
             button.removeAttribute('aria-busy');
-            button.textContent = 'Continue';
+            button.textContent = 'Take me back';
         }
     });
 

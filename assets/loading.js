@@ -51,13 +51,13 @@
         steps.forEach((item) => (item.dataset.state = 'waiting'));
         root.classList.remove('is-failed');
         failed.hidden = true;
-        title.firstChild.textContent = 'Developing your day';
+        title.firstChild.textContent = 'Warming up the time machine';
         setProgress(0);
     }
 
     function fail(message) {
         root.classList.add('is-failed');
-        title.firstChild.textContent = 'Something went wrong';
+        title.firstChild.textContent = 'The machine hit turbulence';
         errorText.textContent = message;
         failed.hidden = false;
         retry.focus();
@@ -67,9 +67,9 @@
         steps.forEach((item) => (item.dataset.state = 'done'));
         setProgress(total);
         root.classList.add('is-done');
-        title.firstChild.textContent = 'Ready';
-        note.textContent = 'Here it comes.';
-        live.textContent = 'Your day is ready.';
+        title.firstChild.textContent = 'Landed';
+        note.textContent = 'Hold on tight.';
+        live.textContent = 'Landed. Your day is ready.';
 
         // A short pause so the full bar is seen, then fade out and go.
         setTimeout(() => {
@@ -148,7 +148,7 @@
 
         // The stream closed without a final message: the connection dropped or the server stopped early.
         if (!ended) {
-            fail('The connection dropped before your day was ready. Your details are still saved.');
+            fail('The signal dropped before we landed. Your coordinates are still saved, so fire it up again.');
         }
     }
 

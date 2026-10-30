@@ -80,7 +80,7 @@
 
     function render() {
         if (results.length === 0) {
-            showMessage('No matching places. Try a different spelling.');
+            showMessage('No landing sites match. Try a different spelling.');
             return;
         }
 
@@ -114,7 +114,7 @@
         const mine = controller;
 
         // Show that a search is running, so a slow connection doesn't look like nothing happened.
-        showMessage('Searching…');
+        showMessage('Scanning the map…');
         search.setAttribute('aria-busy', 'true');
 
         const params = new URLSearchParams({ name: query, count: 8, language: 'en', format: 'json' });
@@ -132,7 +132,7 @@
         } catch (error) {
             if (error.name !== 'AbortError') {
                 results = [];
-                showMessage('Search is unavailable right now. Please try again in a moment.');
+                showMessage('The map scanner is offline. Try again in a moment.');
             }
         } finally {
             // A newer search has its own controller; only the latest one clears the busy state.

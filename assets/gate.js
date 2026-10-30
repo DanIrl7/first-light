@@ -76,8 +76,8 @@
             clearTimeout(slowTimer);
             start.disabled = false;
             start.classList.remove('is-loading');
-            start.textContent = 'Click to begin';
-            note.textContent = 'Best with the sound on.';
+            start.textContent = 'Open the hatch';
+            note.textContent = 'Sound on for the full effect.';
             skip.hidden = false;
             start.focus({ preventScroll: true });
         },
@@ -100,7 +100,7 @@
 
     slowTimer = setTimeout(() => {
         if (!settled && !opened) {
-            note.textContent = 'This is taking longer than usual.';
+            note.textContent = 'The machine\'s running slow today.';
             skip.hidden = false;
         }
     }, SLOW_AFTER);

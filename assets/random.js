@@ -1,4 +1,4 @@
-// "Randomize the day": a random date and a well-known city, so someone can see what the page does without typing.
+// "Surprise me!": a random date and a well-known city, so someone can see what the page does without typing.
 // On the start form the button fills in the birthday and birth place and leaves the name for the visitor.
 // At the bottom of the day page it sends the same name straight through for a new random day.
 (function () {
@@ -134,7 +134,7 @@
             search.dispatchEvent(new Event('change', { bubbles: true }));
 
             if (note) {
-                note.textContent = `A random day: ${choice.date.text}, in ${choice.label}.` + (nameInput.value.trim() === '' ? ' Add your name, then continue.' : '');
+                note.textContent = `The dial landed on ${choice.date.text}, in ${choice.label}.` + (nameInput.value.trim() === '' ? ' Add your name, then take me back.' : ' Hit take me back when you\'re ready.');
                 note.hidden = false;
             }
 
@@ -153,7 +153,7 @@
             again.disabled = true;
             again.classList.add('is-loading');
             again.setAttribute('aria-busy', 'true');
-            again.textContent = 'Picking a day';
+            again.textContent = 'Spinning the dial';
             again.form.submit();
         });
     }

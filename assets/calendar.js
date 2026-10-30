@@ -61,11 +61,11 @@
         'aria-haspopup': 'dialog',
         'aria-expanded': 'false',
     });
-    toggle.textContent = selected ? label(selected) : 'Choose your birthday';
+    toggle.textContent = selected ? label(selected) : 'Dial in your birthday';
 
     const panel = element('div', 'date-picker-panel', {
         role: 'dialog',
-        'aria-label': 'Choose your birthday',
+        'aria-label': 'Dial in your birthday',
     });
     panel.hidden = true;
 

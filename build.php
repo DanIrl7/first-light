@@ -66,5 +66,5 @@ try {
     emit(['done' => true]);
 } catch (Throwable $error) {
     error_log('build.php: ' . $error->getMessage());
-    emit(['error' => 'Something went wrong while gathering your day.']);
+    emit(['error' => 'The machine stalled before it reached your day.']);
 }

@@ -53,19 +53,19 @@
         }
 
         setStatus(on
-            ? 'The song plays all the way down the page, and is a little quieter away from this video.'
-            : 'The sound is off. Use the button in the corner to turn it on.');
+            ? 'Your soundtrack follows you down the page, and gets a little quieter away from this video.'
+            : 'The radio is off. Use the button in the corner to turn it on.');
     }
 
     function loadApi() {
         window.onYouTubeIframeAPIReady = createPlayer;
-        setStatus('Loading the music video…');
+        setStatus('Tuning the radio…');
 
         const script = document.createElement('script');
         script.src = 'https://www.youtube.com/iframe_api';
         script.onerror = () => {
             markReady();
-            fail('The music couldn\'t load. Check your connection.', 'Search for the song on YouTube instead.');
+            fail('The soundtrack didn\'t make the trip. Check your connection.', 'You can search for the song on YouTube instead.');
         };
         document.head.appendChild(script);
     }
@@ -156,7 +156,7 @@
             150: 'The video owner doesn\'t allow it to be played on other sites.',
         };
 
-        return (reasons[code] || 'This video can\'t be played here.') + ' You can search for the song on YouTube instead.';
+        return 'The soundtrack didn\'t make the trip. ' + (reasons[code] || 'This video can\'t be played here.') + ' You can search for the song on YouTube instead.';
     }
 
     function turnOnSound() {

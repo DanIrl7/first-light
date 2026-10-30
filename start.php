@@ -15,7 +15,7 @@ $birthday = trim((string) ($_POST['birthday'] ?? ''));
 $errors = [];
 
 if ($name === '' || mb_strlen($name) > 80) {
-    $errors['name'] = 'Please enter a name (up to 80 characters).';
+    $errors['name'] = 'The logbook needs a name (up to 80 characters).';
 }
 
 $earliest = new DateTimeImmutable('1940-01-01');
@@ -23,14 +23,14 @@ $today = new DateTimeImmutable('today');
 $date = false;
 
 if ($birthday === '') {
-    $errors['birthday'] = 'Choose your birthday from the calendar.';
+    $errors['birthday'] = 'Pick a date on the calendar to set the dials.';
 } else {
     $date = DateTimeImmutable::createFromFormat('!Y-m-d', $birthday);
 
     if ($date === false || $date->format('Y-m-d') !== $birthday) {
-        $errors['birthday'] = 'That date wasn\'t recognised. Please choose it from the calendar again.';
+        $errors['birthday'] = 'The machine didn\'t recognise that date. Pick it from the calendar again.';
     } elseif ($date < $earliest || $date > $today) {
-        $errors['birthday'] = 'Please pick a birthday between 1 January 1940 and today.';
+        $errors['birthday'] = 'That\'s outside the machine\'s range. Pick a date between 1 January 1940 and today.';
     }
 }
 
@@ -41,19 +41,19 @@ if (($_POST['place_latitude'] ?? '') !== '') {
     $place = place_from_selection($_POST);
 
     if ($place === null) {
-        $errors['place'] = 'That place couldn\'t be read. Please choose it from the list again.';
+        $errors['place'] = 'The machine couldn\'t lock onto that place. Choose it from the list again.';
     }
 } else {
     $city = trim((string) ($_POST['city'] ?? ''));
     $country = trim((string) ($_POST['country'] ?? ''));
 
     if ($city === '' || $country === '') {
-        $errors['place'] = 'Please choose a birth place from the list, or enter a city and a country.';
+        $errors['place'] = 'Choose a point of arrival from the list, or enter a city and a country.';
     } else {
         $place = geocode_city($city, $country);
 
         if ($place === null) {
-            $errors['place'] = 'We could not find "' . $city . '" in "' . $country . '". Check the spelling, or try a larger nearby city.';
+            $errors['place'] = 'The machine couldn\'t find "' . $city . '" in "' . $country . '". Check the spelling, or try a larger city nearby.';
         }
     }
 }

@@ -8,7 +8,7 @@ require __DIR__ . '/includes/youtube.php';
 set_time_limit(120);
 
 if (empty($_SESSION['profile'])) {
-    set_flash('Enter your details first.');
+    set_flash('The machine needs coordinates first. Fill in the form to begin.');
     redirect('/');
 }
 
@@ -87,12 +87,12 @@ $videoId = $song !== null
         <!-- Covers the page while the music video loads. gate.js removes it after the click. -->
         <div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title">
             <div class="gate-inner">
-                <p class="eyebrow">Your day is ready</p>
-                <h2 class="gate-title" id="gate-title"><?= e($day['name']) ?>, here's the day you were born.</h2>
-                <p class="gate-song">With "<?= e($song['song']) ?>" by <?= e($song['artist']) ?> playing</p>
-                <button type="button" class="gate-button is-loading" id="gate-start" disabled>Preparing the music…</button>
-                <p class="gate-note" id="gate-note" role="status">Loading the music video.</p>
-                <button type="button" class="gate-skip" id="gate-skip" hidden>Continue without sound</button>
+                <p class="eyebrow">Landing sequence complete</p>
+                <h2 class="gate-title" id="gate-title"><?= e($day['name']) ?>, you've landed.</h2>
+                <p class="gate-song">Your arrival song: "<?= e($song['song']) ?>" by <?= e($song['artist']) ?></p>
+                <button type="button" class="gate-button is-loading" id="gate-start" disabled>Warming up the soundtrack…</button>
+                <p class="gate-note" id="gate-note" role="status">Tuning the radio.</p>
+                <button type="button" class="gate-skip" id="gate-skip" hidden>Step out without sound</button>
             </div>
         </div>
 
@@ -139,13 +139,13 @@ $videoId = $song !== null
                 </p>
             </div>
 
-            <div class="scroll-cue" aria-hidden="true">Scroll</div>
+            <div class="scroll-cue" aria-hidden="true">Scroll to travel</div>
         </section>
 
         <section class="scene scene-place">
             <div class="place-grid">
                 <div>
-                    <p class="eyebrow" data-reveal>The place</p>
+                    <p class="eyebrow" data-reveal>The destination</p>
                     <?php if (!empty($day['city']['extract'])): ?>
                         <p class="lede" data-scrub><?= e($day['city']['extract']) ?></p>
                         <?php if ($cityUrl !== null): ?>
@@ -169,7 +169,7 @@ $videoId = $song !== null
                             <span class="meta">at <?= e($day['weather']['time']) ?></span>
                         </p>
                     <?php else: ?>
-                        <p class="meta">Weather for this day isn't available.</p>
+                        <p class="meta">The weather records for this day didn't survive the trip.</p>
                     <?php endif; ?>
                 </div>
             </div>
@@ -197,11 +197,11 @@ $videoId = $song !== null
         <section class="scene scene-events">
             <div class="ghost" aria-hidden="true" data-speed="0.8"><span><?= e($birthday->format('Y')) ?> · <?= e($birthday->format('Y')) ?> · <?= e($birthday->format('Y')) ?> · <?= e($birthday->format('Y')) ?></span></div>
             <p class="eyebrow">The world that day</p>
-            <h2 data-split>What happened that day</h2>
-            <p class="note" data-reveal>Events Wikipedia lists for this date in <?= e($birthday->format('Y')) ?>, in the order its monthly article gives them.</p>
+            <h2 data-split>What was going on</h2>
+            <p class="note" data-reveal>Headlines Wikipedia lists for this date in <?= e($birthday->format('Y')) ?>, in the order its monthly article gives them.</p>
 
             <?php if ($day['events'] === []): ?>
-                <p class="meta">No events are listed for this date in <?= e($birthday->format('Y')) ?>.</p>
+                <p class="meta">The history books are quiet about this date in <?= e($birthday->format('Y')) ?>.</p>
             <?php endif; ?>
 
             <?php foreach ($day['events'] as $event): ?>
@@ -234,7 +234,7 @@ $videoId = $song !== null
             <p class="note" data-reveal>Five of the most widely covered people born on this date, ranked the same way. Shown for what they're known for, not judged.</p>
 
             <?php if ($day['people'] === []): ?>
-                <p class="meta" style="margin-inline: var(--gutter)">No people could be loaded for this date right now.</p>
+                <p class="meta" style="margin-inline: var(--gutter)">The machine couldn't find anyone born on this date right now.</p>
             <?php else: ?>
                 <div class="people-track">
                     <?php foreach ($day['people'] as $person): ?>
@@ -278,12 +278,12 @@ $videoId = $song !== null
                     <p class="note" id="music-status"></p>
                 <?php else: ?>
                     <p class="note">
-                        There's no music video linked for this song yet. You can
+                        This song didn't make the trip: no music video is linked for it yet. You can
                         <a href="<?= e($searchUrl) ?>" rel="noopener">search for it on YouTube</a>.
                     </p>
                 <?php endif; ?>
             <?php else: ?>
-                <p class="meta">The Billboard Hot 100 chart starts in 1958, so there's no chart song for this date.</p>
+                <p class="meta">The Billboard Hot 100 only starts in 1958, so there's no chart song waiting for you on this date.</p>
             <?php endif; ?>
         </section>
 
@@ -315,11 +315,11 @@ $videoId = $song !== null
             <input type="hidden" name="place_latitude" value="">
             <input type="hidden" name="place_longitude" value="">
             <input type="hidden" name="place_timezone" value="">
-            <p>Curious about another day?</p>
-            <button type="button" class="button-secondary" id="random-again" hidden>Randomize the day</button>
+            <p>Fancy another trip?</p>
+            <button type="button" class="button-secondary" id="random-again" hidden>Surprise me!</button>
         </form>
 
-        <p class="admin-link"><a href="/">Start over</a></p>
+        <p class="admin-link"><a href="/">Back to the controls</a></p>
     </main>
     </div>
     </div>

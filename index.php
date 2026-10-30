@@ -41,9 +41,9 @@ if ($placeText === '' && old_value($old, 'place_latitude') !== '') {
     <div class="glow" aria-hidden="true"></div>
 
     <main>
-        <p class="eyebrow" data-intro>A scroll through your first day</p>
+        <p class="eyebrow" data-intro>Strap in. We're going back to day one.</p>
         <h1 data-intro>First <em>Light</em></h1>
-        <p class="intro" data-intro>Enter your details to see what the world looked like the day you were born.</p>
+        <p class="intro" data-intro>Tell the time machine who you are, when you arrived and where. It will take you back to see what the world looked like that day.</p>
 
         <?php if ($flash !== null): ?>
             <p class="flash" role="alert"><?= e($flash) ?></p>
@@ -52,39 +52,39 @@ if ($placeText === '' && old_value($old, 'place_latitude') !== '') {
         <form method="post" action="/start" class="card" id="born-form" novalidate>
             <?= csrf_field() ?>
 
-            <label>Name
+            <label>Who's travelling?
                 <input type="text" name="name" id="field-name" maxlength="80" required autocomplete="given-name"
                     value="<?= e(old_value($old, 'name')) ?>"
                     <?= isset($errors['name']) ? 'aria-invalid="true"' : '' ?> aria-describedby="error-name">
             </label>
             <p class="field-error" id="error-name" role="alert" <?= isset($errors['name']) ? '' : 'hidden' ?>><?= e($errors['name'] ?? '') ?></p>
 
-            <label>Birthday
+            <label>Date of arrival
                 <input type="date" name="birthday" id="birthday-native" class="native-date" min="1940-01-01" max="<?= e($today) ?>" required
                     value="<?= e(old_value($old, 'birthday')) ?>"
                     <?= isset($errors['birthday']) ? 'aria-invalid="true"' : '' ?> aria-describedby="error-birthday">
             </label>
             <p class="field-error" id="error-birthday" role="alert" <?= isset($errors['birthday']) ? '' : 'hidden' ?>><?= e($errors['birthday'] ?? '') ?></p>
-            <small class="hint">We can go back as far as 1 January 1940.</small>
+            <small class="hint">The machine can reach back to 1 January 1940. Not a day earlier.</small>
 
-            <label>Birth place
-                <input type="text" name="place_search" id="place-search" autocomplete="off" placeholder="Start typing a city" aria-autocomplete="list" aria-controls="place-results" aria-expanded="false"
+            <label>Point of arrival
+                <input type="text" name="place_search" id="place-search" autocomplete="off" placeholder="Where did you land? Start typing a city" aria-autocomplete="list" aria-controls="place-results" aria-expanded="false"
                     value="<?= e($placeText) ?>"
                     <?= isset($errors['place']) ? 'aria-invalid="true"' : '' ?> aria-describedby="error-place">
             </label>
             <div class="place-results" id="place-results" role="listbox" hidden></div>
             <p class="field-error" id="error-place" role="alert" <?= isset($errors['place']) ? '' : 'hidden' ?>><?= e($errors['place'] ?? '') ?></p>
-            <small class="hint">Pick the place from the list, so cities with the same name are told apart.</small>
+            <small class="hint">Pick your city from the list, so the machine doesn't land you in the wrong Paris.</small>
 
             <div class="fallback-place">
-                <label>Birth city
+                <label>City of arrival
                     <input type="text" name="city" maxlength="80" value="<?= e(old_value($old, 'city')) ?>">
                 </label>
 
-                <label>Birth country
+                <label>Country of arrival
                     <input type="text" name="country" maxlength="80" value="<?= e(old_value($old, 'country')) ?>">
                 </label>
-                <small class="hint">The country tells apart cities with the same name.</small>
+                <small class="hint">The country stops the machine mixing up cities with the same name.</small>
             </div>
 
             <input type="hidden" name="place_name" id="place_name" value="<?= e(old_value($old, 'place_name')) ?>">
@@ -96,8 +96,8 @@ if ($placeText === '' && old_value($old, 'place_latitude') !== '') {
             <input type="hidden" name="place_timezone" id="place_timezone" value="<?= e(old_value($old, 'place_timezone')) ?>">
 
             <div class="form-actions">
-                <button type="submit">Continue</button>
-                <button type="button" class="button-secondary" id="random-day" hidden>Randomize the day</button>
+                <button type="submit">Take me back</button>
+                <button type="button" class="button-secondary" id="random-day" hidden>Surprise me!</button>
             </div>
             <small class="hint" id="random-note" role="status" hidden></small>
         </form>
