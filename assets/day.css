@@ -270,16 +270,18 @@ body.page-day {
 
 .leader {
     display: flex;
+    flex-wrap: wrap; /* the name drops under the photo when there isn't room beside it */
     align-items: center;
     gap: 14px;
     margin: 0;
 }
 
 .leader img {
-    width: 64px;
-    height: 64px;
+    width: clamp(192px, 28vw, 320px);
+    height: clamp(192px, 28vw, 320px);
     border-radius: 50%;
     object-fit: cover;
+    object-position: center 20%; /* keeps the face in frame */
     filter: grayscale(0.4);
 }
 
@@ -595,6 +597,28 @@ img.is-broken {
     font-weight: 600;
 }
 
+/* Randomize the day, below the certificate. */
+.again {
+    display: grid;
+    justify-items: center;
+    gap: 14px;
+    padding: 0 var(--gutter) 40px;
+    text-align: center;
+}
+
+.again p {
+    margin: 0;
+    color: var(--muted);
+}
+
+.again button {
+    justify-self: center;
+}
+
+.again .button-secondary[hidden] {
+    display: none;
+}
+
 .admin-link {
     margin: 0;
     padding: 0 var(--gutter) 64px;
@@ -603,22 +627,6 @@ img.is-broken {
     font-size: 0.8rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-}
-
-/* Scroll progress, along the top edge. */
-.progress {
-    position: fixed;
-    inset: 0 0 auto;
-    z-index: 40;
-    height: 2px;
-}
-
-.progress span {
-    display: block;
-    height: 100%;
-    background: var(--accent);
-    transform: scaleX(0);
-    transform-origin: left;
 }
 
 /* Clock pinned to the top-right corner while scrolling. */

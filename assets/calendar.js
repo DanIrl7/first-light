@@ -176,13 +176,27 @@
         }
     }
 
-    function choose(iso) {
+    function setDate(iso) {
         selected = iso;
         input.value = iso;
+        view = { y: parse(iso).y, m: parse(iso).m };
         input.dispatchEvent(new Event('change', { bubbles: true }));
         toggle.textContent = label(iso);
+    }
+
+    function choose(iso) {
+        setDate(iso);
         close(true);
     }
+
+    // Lets other scripts (the random-day button) set the date: input.dispatchEvent(new CustomEvent('set-date', { detail: iso })).
+    input.addEventListener('set-date', (event) => {
+        const iso = String(event.detail);
+
+        if (/^\d{4}-\d{2}-\d{2}$/.test(iso) && iso >= minIso && iso <= maxIso) {
+            setDate(iso);
+        }
+    });
 
     toggle.addEventListener('click', () => (panel.hidden ? open() : close(false)));
     prev.addEventListener('click', () => shift(-1));

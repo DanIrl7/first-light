@@ -85,18 +85,6 @@
             });
         }
 
-        // Scroll progress along the top edge.
-        const bar = document.querySelector('.progress span');
-
-        if (bar) {
-            gsap.to(bar, {
-                scaleX: 1,
-                ease: 'none',
-                // Refreshed last, so the page height already includes the pinned scene's spacing.
-                scrollTrigger: { start: 0, end: 'max', scrub: 0.3, refreshPriority: 99 },
-            });
-        }
-
         // The sky behind the page follows the clock: night at the top, dawn at 06:00, bright at noon,
         // dusk at 18:00, and night again at the bottom. Layers cross-fade, which keeps scrolling smooth.
         if (document.querySelector('.sky')) {

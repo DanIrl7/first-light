@@ -28,6 +28,12 @@
 
 html {
     background: var(--bg);
+    /* No scrollbar strip down the side. The page still scrolls with the wheel, touch, keys and trackpad. */
+    scrollbar-width: none;
+}
+
+html::-webkit-scrollbar {
+    display: none;
 }
 
 body {
@@ -212,6 +218,29 @@ button:hover {
 
 button:active {
     transform: scale(0.97);
+}
+
+.form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+/* A quieter button beside the main one. */
+.button-secondary {
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+}
+
+.button-secondary:hover {
+    border-color: var(--accent);
+    background: rgba(110, 231, 200, 0.1);
+}
+
+.button-secondary[hidden] {
+    display: none;
 }
 
 /* While the form is sent: a small spinner beside the label, and no hover lift. */

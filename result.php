@@ -114,8 +114,6 @@ $videoId = $song !== null
         <i class="sky-orb"></i>
     </div>
 
-    <div class="progress" aria-hidden="true"><span></span></div>
-
     <div class="clock" aria-hidden="true">
         <span class="clock-time" id="clock-time">00:00</span>
         <span class="clock-date"><?= e($birthday->format('j M Y')) ?></span>
@@ -185,7 +183,7 @@ $videoId = $song !== null
                             <?php if ($leader !== null): ?>
                                 <figure class="leader">
                                     <?php if (safe_url($leader['image']) !== null): ?>
-                                        <img src="<?= e(safe_url($leader['image'])) ?>" alt="" width="64" height="64" loading="lazy">
+                                        <img src="<?= e(safe_url($leader['image'])) ?>" alt="" width="320" height="320" loading="lazy">
                                     <?php endif; ?>
                                     <figcaption><?= e($title) ?><strong><?= e($leader['name']) ?></strong></figcaption>
                                 </figure>
@@ -305,6 +303,22 @@ $videoId = $song !== null
             </div>
         </section>
 
+        <!-- A new random day for the same name. random.js fills in the date and place, then sends this to /start. -->
+        <form class="again" method="post" action="/start">
+            <?= csrf_field() ?>
+            <input type="hidden" name="name" value="<?= e($day['name']) ?>">
+            <input type="hidden" name="birthday" value="">
+            <input type="hidden" name="place_name" value="">
+            <input type="hidden" name="place_region" value="">
+            <input type="hidden" name="place_country" value="">
+            <input type="hidden" name="place_country_code" value="">
+            <input type="hidden" name="place_latitude" value="">
+            <input type="hidden" name="place_longitude" value="">
+            <input type="hidden" name="place_timezone" value="">
+            <p>Curious about another day?</p>
+            <button type="button" class="button-secondary" id="random-again" hidden>Randomize the day</button>
+        </form>
+
         <p class="admin-link"><a href="/">Start over</a></p>
     </main>
     </div>
@@ -318,5 +332,6 @@ $videoId = $song !== null
     <script src="assets/gate.js"></script>
     <script src="assets/cinema.js"></script>
     <script src="assets/music.js"></script>
+    <script src="assets/random.js"></script>
 </body>
 </html>

@@ -7,7 +7,6 @@
 
 html.js.has-gate {
     overflow: hidden;
-    scrollbar-gutter: stable; /* the page doesn't shift when scrolling comes back */
 }
 
 html.js.has-gate .gate {

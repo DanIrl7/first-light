@@ -7,6 +7,7 @@ Live at https://born-here.onrender.com (the address comes from the Render servic
 ## Features
 
 - **Input:** name, birthday (from 1 January 1940), and birth place. The place is picked from a suggestion list, so cities with the same name are told apart. There's a visible calendar for the birthday, and a fallback city and country field if the list isn't available. If a submit fails, every field keeps what was typed and each error shows under its field.
+- **Randomize the day:** a button on the form fills in a random date (from 1958, so there's always a chart song) and a random well-known city. The visitor only adds a name.
 - **Loading screen:** the first time a day is built, a screen shows each step (city, leaders, weather, song, people, events, video) as it finishes, with a retry if something fails.
 - **Click to begin:** the day page opens behind a cover while the music video loads. The button unlocks once the video is playing. If that takes more than 30 seconds, or the video can't load, "Continue without sound" appears. The click is what lets the browser play sound.
 - **Music:** the Billboard Hot 100 number one in effect that week. It plays all the way down the page, a little quieter away from its own section, and a button in the corner turns it on and off. The video loops and requests 720p.
@@ -120,7 +121,7 @@ Each new search costs 100 units of YouTube's 10,000-unit daily quota, so `--limi
 - `build.php`: gathers the day and reports progress to the loading screen
 - `result.php`: the day page
 - `includes/`: data sources (`wiki.php`, `billboard.php`, `weather.php`, `geocode.php`, `leaders.php`, `youtube.php`, `music.php`), caching (`app.php`), and the page builder (`day.php`)
-- `assets/`: styles and scripts. `cinema.js` holds the scroll animations, `gate.js` the click-to-begin cover, `music.js` the player, `day.js` the clock, and `dev-motion.js` the localhost-only motion override
+- `assets/`: styles and scripts. `cinema.js` holds the scroll animations, `gate.js` the click-to-begin cover, `music.js` the player, `day.js` the clock, `random.js` the randomize button, and `dev-motion.js` the localhost-only motion override
 - `data/videos.csv`: video IDs for chart songs
 - `schema.sql`: the database schema
 - `Dockerfile`: the container used for hosting

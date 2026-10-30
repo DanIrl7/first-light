@@ -95,13 +95,18 @@ if ($placeText === '' && old_value($old, 'place_latitude') !== '') {
             <input type="hidden" name="place_longitude" id="place_longitude" value="<?= e(old_value($old, 'place_longitude')) ?>">
             <input type="hidden" name="place_timezone" id="place_timezone" value="<?= e(old_value($old, 'place_timezone')) ?>">
 
-            <button type="submit">Continue</button>
+            <div class="form-actions">
+                <button type="submit">Continue</button>
+                <button type="button" class="button-secondary" id="random-day" hidden>Randomize the day</button>
+            </div>
+            <small class="hint" id="random-note" role="status" hidden></small>
         </form>
     </main>
 
     <script src="assets/calendar.js"></script>
     <script src="assets/places.js"></script>
     <script src="assets/form.js"></script>
+    <script src="assets/random.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
     <script src="assets/start.js"></script>
 </body>
