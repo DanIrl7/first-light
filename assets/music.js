@@ -1,14 +1,20 @@
-// Music player for the chart song. The video starts as soon as the page loads, muted, because browsers
-// only allow sound after the visitor interacts with the page. The first click or key press turns the sound on.
-// The video loops inside its section, and its volume eases down as the section scrolls off the screen.
+// Music player for the chart song. The video starts loading, muted, as soon as the page does, behind the
+// "click to begin" cover (gate.js). That click is the visitor's permission to play sound, so it turns the sound on.
+// The song then plays all the way down the page, getting a little quieter away from its own section.
+// A button in the corner turns it off and on.
 (function () {
     const section = document.getElementById('music');
-    const button = document.getElementById('music-play');
     const holder = document.getElementById('music-player');
     const status = document.getElementById('music-status');
+    const toggle = document.getElementById('sound-toggle');
+    const gate = window.bornGate || null;
 
-    if (!section || !button || !holder) {
+    if (!section || !holder) {
         return;
+    }
+
+    if (gate) {
+        gate.attached = true;
     }
 
     const videoId = section.dataset.videoId;
@@ -19,6 +25,7 @@
 
     let player = null;
     let playerReady = false;
+    let soundOn = false;
     let readyTimer = null;
 
     // The frame shimmers until the video is actually playing (or it's clear it won't start by itself).
@@ -36,6 +43,20 @@
         }
     }
 
+    function setSound(on) {
+        soundOn = on;
+
+        if (toggle) {
+            toggle.classList.toggle('is-muted', !on);
+            toggle.setAttribute('aria-pressed', String(on));
+            toggle.setAttribute('aria-label', on ? 'Turn the music off' : 'Turn the music on');
+        }
+
+        setStatus(on
+            ? 'The song plays all the way down the page, and is a little quieter away from this video.'
+            : 'The sound is off. Use the button in the corner to turn it on.');
+    }
+
     function loadApi() {
         window.onYouTubeIframeAPIReady = createPlayer;
         setStatus('Loading the music video…');
@@ -44,7 +65,7 @@
         script.src = 'https://www.youtube.com/iframe_api';
         script.onerror = () => {
             markReady();
-            setStatus('The music player couldn\'t load. Check your connection, or search for the song on YouTube.');
+            fail('The music couldn\'t load. Check your connection.', 'Search for the song on YouTube instead.');
         };
         document.head.appendChild(script);
     }
@@ -56,7 +77,7 @@
             height: '100%',
             playerVars: {
                 autoplay: 1,
-                mute: 1, // starts muted; the sound is turned on after the visitor's first click or key press
+                mute: 1, // starts muted; the click on the cover turns the sound on
                 loop: 1,
                 playlist: videoId, // YouTube only loops a video when it's also listed as the playlist
                 playsinline: 1,
@@ -77,31 +98,52 @@
                     player.unloadModule('cc');
                     updateVolume();
                     player.playVideo();
-                    setStatus('Starting the video…');
 
-                    // Some browsers won't start a video on their own. Don't leave the frame shimmering forever.
+                    // Some browsers won't start a video on their own. The click on the cover starts it then,
+                    // so don't keep the visitor waiting for something only that click can do.
                     readyTimer = setTimeout(() => {
                         markReady();
-                        setStatus('The video is ready. Click "Turn on sound" to start it.');
+
+                        if (gate) {
+                            gate.ready();
+                        }
                     }, 6000);
                 },
                 onStateChange: (event) => {
                     // 1 means playing.
                     if (event.data === 1) {
                         markReady();
-                        setStatus(button.hidden
-                            ? 'The video loops and gets quieter as you scroll away from it.'
-                            : 'Playing without sound. Click anywhere to turn it on.');
+
+                        if (gate) {
+                            gate.ready();
+                        }
+                    }
+
+                    // 0 means ended. Looping normally handles it; this is the back-up.
+                    if (event.data === 0) {
+                        player.playVideo();
                     }
                 },
                 onError: (event) => {
                     markReady();
-                    button.hidden = true;
                     console.warn('YouTube player error', event.data);
-                    setStatus(errorMessage(event.data));
+                    fail(errorMessage(event.data));
                 },
             },
         });
+    }
+
+    // Nothing can be played: let the visitor through, and take the sound button away.
+    function fail(message, extra) {
+        if (toggle) {
+            toggle.hidden = true;
+        }
+
+        if (gate) {
+            gate.fail(message);
+        }
+
+        setStatus(extra ? message + ' ' + extra : message);
     }
 
     // Codes from YouTube's IFrame API: https://developers.google.com/youtube/iframe_api_reference#Events
@@ -125,27 +167,39 @@
         player.unMute();
         // Also starts the video if the browser wouldn't let it begin on its own.
         player.playVideo();
-        button.hidden = true;
-        setStatus('The video loops and gets quieter as you scroll away from it.');
+        setSound(true);
         updateVolume();
     }
 
-    button.addEventListener('click', turnOnSound);
-
-    // The first click or key press anywhere on the page turns the sound on. Browsers accept that as the
-    // visitor's permission, so the sound isn't blocked. Once it's on, these listeners are removed.
-    function onFirstInteraction() {
+    function turnOffSound() {
         if (!playerReady) {
             return;
         }
 
-        document.removeEventListener('pointerdown', onFirstInteraction);
-        document.removeEventListener('keydown', onFirstInteraction);
-        turnOnSound();
+        // Muted rather than paused, so the video in its section keeps playing.
+        player.mute();
+        setSound(false);
     }
 
-    document.addEventListener('pointerdown', onFirstInteraction);
-    document.addEventListener('keydown', onFirstInteraction);
+    // The click on the cover. It runs inside that click, which is what lets the browser play sound.
+    window.addEventListener('gate:sound', turnOnSound);
+
+    // Continuing without sound leaves the video playing, muted. Say so, unless the video never loaded.
+    window.addEventListener('gate:open', () => {
+        if (playerReady && !soundOn) {
+            setSound(false);
+        }
+    });
+
+    if (toggle) {
+        toggle.addEventListener('click', () => {
+            if (soundOn) {
+                turnOffSound();
+            } else {
+                turnOnSound();
+            }
+        });
+    }
 
     // Full volume while the section is on screen, easing down to the minimum over one screen height away.
     function updateVolume() {
@@ -180,12 +234,25 @@
 
     window.addEventListener('resize', updateVolume);
 
-    // Pause when the tab is hidden, so the video doesn't keep playing in the background.
+    // With smooth scrolling the page keeps gliding for a moment after the scroll events stop,
+    // so check the volume once more when it settles.
+    if (window.ScrollTrigger) {
+        ScrollTrigger.addEventListener('scrollEnd', updateVolume);
+    }
+
+    // Pause when the tab is hidden, so the video doesn't keep playing in the background, and carry on when it's back.
     document.addEventListener('visibilitychange', () => {
-        if (document.hidden && playerReady) {
+        if (!playerReady) {
+            return;
+        }
+
+        if (document.hidden) {
             player.pauseVideo();
+        } else {
+            player.playVideo();
         }
     });
 
+    setSound(false);
     loadApi();
 })();

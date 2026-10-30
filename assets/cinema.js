@@ -8,6 +8,10 @@
 
     gsap.registerPlugin(ScrollTrigger);
 
+    if (window.ScrollSmoother) {
+        gsap.registerPlugin(ScrollSmoother);
+    }
+
     // Wraps every word of an element in a span so words can be animated one by one.
     // With a mask, each word is clipped so it can rise into place; without one, words are plain spans.
     function splitWords(el, mask = true) {
@@ -66,26 +70,19 @@
     motion.add('(prefers-reduced-motion: no-preference)', () => {
         const hero = document.querySelector('.scene-hero');
 
-        // Smooth, eased scrolling. Lenis only changes how wheel movement is applied; the page still scrolls
-        // natively, and ScrollTrigger is told about every position it reaches.
-        let stopSmoothScroll = null;
+        // Smooth, eased scrolling with GSAP's ScrollSmoother. It must exist before any ScrollTrigger, so it comes
+        // first. Elements with data-speed drift at a different pace to the page, and data-lag makes them trail
+        // behind it. Touch screens keep their native scrolling, which already has momentum.
+        let smoother = null;
 
-        if (window.Lenis) {
-            const lenis = new Lenis({ duration: 1.15, smoothWheel: true });
-            const tick = (time) => lenis.raf(time * 1000);
-
-            lenis.on('scroll', ScrollTrigger.update);
-            gsap.ticker.add(tick);
-            gsap.ticker.lagSmoothing(0);
-
-            document.documentElement.classList.add('lenis', 'lenis-smooth');
-
-            // Undone if the visitor switches to reduced motion while the page is open.
-            stopSmoothScroll = () => {
-                gsap.ticker.remove(tick);
-                lenis.destroy();
-                document.documentElement.classList.remove('lenis', 'lenis-smooth');
-            };
+        if (window.ScrollSmoother && document.getElementById('smooth-wrapper')) {
+            smoother = ScrollSmoother.create({
+                wrapper: '#smooth-wrapper',
+                content: '#smooth-content',
+                smooth: 1.2,
+                effects: true,
+                smoothTouch: false,
+            });
         }
 
         // Scroll progress along the top edge.
@@ -151,7 +148,13 @@
         if (hero) {
             const title = hero.querySelector('[data-split]');
             const words = title ? splitWords(title) : [];
-            const intro = gsap.timeline({ defaults: { ease: 'power4.out' } });
+            // While the "click to begin" cover is up (gate.js), the opening shot waits behind it.
+            const gated = document.documentElement.classList.contains('has-gate');
+            const intro = gsap.timeline({ paused: gated, defaults: { ease: 'power4.out' } });
+
+            if (gated) {
+                window.addEventListener('gate:open', () => intro.play(), { once: true });
+            }
 
             intro
                 .from('.hero-img', { scale: 1.25, duration: 2.6, ease: 'power2.out' }, 0)
@@ -327,9 +330,10 @@
             }
         }
 
+        // Undone if the visitor switches to reduced motion while the page is open.
         return () => {
-            if (stopSmoothScroll) {
-                stopSmoothScroll();
+            if (smoother) {
+                smoother.kill();
             }
         };
     });

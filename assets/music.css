@@ -1,11 +1,189 @@
 /* Music player. Colours come from the :root tokens in style.css; the full-width frame is sized in day.css. */
 
-.music-button {
-    margin-top: 1.5rem;
+/* The "click to begin" cover (gate.js). Shown only with JavaScript, and only until it is dismissed. */
+.gate {
+    display: none;
 }
 
-.music-button[hidden] {
+html.js.has-gate {
+    overflow: hidden;
+    scrollbar-gutter: stable; /* the page doesn't shift when scrolling comes back */
+}
+
+html.js.has-gate .gate {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: grid;
+    place-items: center;
+    padding: var(--gutter);
+    background: radial-gradient(60% 50% at 50% 42%, rgba(228, 179, 99, 0.16), transparent 70%), var(--bg);
+    text-align: center;
+}
+
+.gate[hidden] {
+    display: none !important;
+}
+
+.gate-inner {
+    display: grid;
+    justify-items: center;
+    gap: 1.1rem;
+    max-width: 38rem;
+}
+
+.gate-inner .eyebrow,
+.gate-inner p {
+    margin: 0;
+}
+
+.gate-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 6.5vw, 4rem);
+    font-weight: 700;
+    line-height: 1.05;
+}
+
+.gate-song {
+    color: var(--muted);
+    font-style: italic;
+}
+
+.gate-button {
+    justify-self: center;
+    margin-top: 0.75rem;
+    padding: 16px 36px;
+    font-size: 1.05rem;
+}
+
+.gate-button:disabled {
+    cursor: progress;
+    opacity: 0.85;
+}
+
+.gate-note {
+    min-height: 1.5em;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+/* A quiet text link, unless it's the only way forward. */
+.gate-skip {
+    justify-self: center;
+    padding: 6px 4px;
+    border-radius: 4px;
+    background: none;
+    color: var(--muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+}
+
+.gate-skip:hover {
+    background: none;
+    color: var(--text);
+    transform: none;
+}
+
+.gate-skip[hidden] {
     display: none;
+}
+
+.gate-skip.is-primary {
+    padding: 13px 26px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--on-accent);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.gate-skip.is-primary:hover {
+    background: #f0c47d;
+    color: var(--on-accent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    html.gate-opening .gate {
+        transition: opacity 0.9s var(--ease-out);
+    }
+}
+
+html.gate-opening .gate {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Turns the music on and off from the corner, once the cover is gone. */
+.sound-toggle {
+    position: fixed;
+    left: 16px;
+    bottom: 16px;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: min(70vw, 18rem);
+    padding: 9px 16px 9px 12px;
+    border: 1px solid var(--border);
+    background: rgba(11, 10, 9, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: var(--text);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.sound-toggle:hover {
+    background: rgba(11, 10, 9, 0.8);
+    transform: none;
+}
+
+.sound-toggle[hidden],
+html.has-gate .sound-toggle {
+    visibility: hidden;
+}
+
+.sound-toggle[hidden] {
+    display: none;
+}
+
+.sound-toggle svg {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.sound-toggle .slash {
+    display: none;
+}
+
+.sound-toggle.is-muted .waves {
+    display: none;
+}
+
+.sound-toggle.is-muted .slash {
+    display: inline;
+}
+
+.sound-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@media (max-width: 520px) {
+    .sound-toggle {
+        left: 10px;
+        bottom: 10px;
+    }
 }
 
 /* The player is a little taller than the frame and shifted up, so YouTube's title bar falls outside it. */
@@ -48,7 +226,8 @@
 
 @media print {
     .video,
-    .music-button {
-        display: none;
+    .gate,
+    .sound-toggle {
+        display: none !important;
     }
 }

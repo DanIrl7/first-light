@@ -68,7 +68,7 @@ $videoId = $song !== null
     : null;
 ?>
 <!doctype html>
-<html lang="en">
+<html lang="en"<?= $videoId !== null ? ' class="has-gate"' : '' ?>>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -79,9 +79,33 @@ $videoId = $song !== null
     <link rel="stylesheet" href="assets/style.css">
     <link rel="stylesheet" href="assets/day.css">
     <link rel="stylesheet" href="assets/music.css">
+    <script src="assets/dev-motion.js"></script>
     <script>document.documentElement.classList.add('js');</script>
 </head>
 <body class="page-day">
+    <?php if ($videoId !== null): ?>
+        <!-- Covers the page while the music video loads. gate.js removes it after the click. -->
+        <div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title">
+            <div class="gate-inner">
+                <p class="eyebrow">Your day is ready</p>
+                <h2 class="gate-title" id="gate-title"><?= e($day['name']) ?>, here's the day you were born.</h2>
+                <p class="gate-song">With "<?= e($song['song']) ?>" by <?= e($song['artist']) ?> playing</p>
+                <button type="button" class="gate-button is-loading" id="gate-start" disabled>Preparing the music…</button>
+                <p class="gate-note" id="gate-note" role="status">Loading the music video.</p>
+                <button type="button" class="gate-skip" id="gate-skip" hidden>Continue without sound</button>
+            </div>
+        </div>
+
+        <button type="button" class="sound-toggle is-muted" id="sound-toggle" aria-pressed="false" aria-label="Turn the music on">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path class="speaker" d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/>
+                <path class="waves" d="M15.5 9a4.5 4.5 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/>
+                <path class="slash" d="M16 9.5l5 5M21 9.5l-5 5"/>
+            </svg>
+            <span class="sound-label"><?= e($song['song']) ?></span>
+        </button>
+    <?php endif; ?>
+
     <div class="sky" aria-hidden="true">
         <span class="sky-night"></span>
         <span class="sky-dawn"></span>
@@ -97,6 +121,9 @@ $videoId = $song !== null
         <span class="clock-date"><?= e($birthday->format('j M Y')) ?></span>
     </div>
 
+    <!-- ScrollSmoother moves #smooth-content. Anything fixed to the screen stays outside it (sky, progress, clock). -->
+    <div id="smooth-wrapper">
+    <div id="smooth-content">
     <main class="day">
         <section class="scene scene-hero">
             <?php if ($cityImage !== null): ?>
@@ -138,7 +165,7 @@ $videoId = $song !== null
                         $temperature = (float) $day['weather']['temperature_c'];
                         $decimals = $temperature === round($temperature) ? 0 : 1;
                         ?>
-                        <span class="temp" data-count="<?= e((string) $temperature) ?>" data-decimals="<?= $decimals ?>"><?= e(number_format($temperature, $decimals, '.', '')) ?></span>
+                        <span class="temp" data-speed="1.12" data-count="<?= e((string) $temperature) ?>" data-decimals="<?= $decimals ?>"><?= e(number_format($temperature, $decimals, '.', '')) ?></span>
                         <p class="weather-detail">
                             °C · <?= e($day['weather']['condition']) ?>
                             <span class="meta">at <?= e($day['weather']['time']) ?></span>
@@ -170,7 +197,7 @@ $videoId = $song !== null
         </section>
 
         <section class="scene scene-events">
-            <div class="ghost" aria-hidden="true"><span><?= e($birthday->format('Y')) ?> · <?= e($birthday->format('Y')) ?> · <?= e($birthday->format('Y')) ?> · <?= e($birthday->format('Y')) ?></span></div>
+            <div class="ghost" aria-hidden="true" data-speed="0.8"><span><?= e($birthday->format('Y')) ?> · <?= e($birthday->format('Y')) ?> · <?= e($birthday->format('Y')) ?> · <?= e($birthday->format('Y')) ?></span></div>
             <p class="eyebrow">The world that day</p>
             <h2 data-split>What happened that day</h2>
             <p class="note" data-reveal>Events Wikipedia lists for this date in <?= e($birthday->format('Y')) ?>, in the order its monthly article gives them.</p>
@@ -183,11 +210,11 @@ $videoId = $song !== null
                 <?php $eventImage = safe_url($event['image'] ?? null); ?>
                 <article class="event<?= $eventImage === null ? ' no-media' : '' ?>">
                     <?php if ($eventImage !== null): ?>
-                        <div class="event-media">
+                        <div class="event-media" data-speed="0.94">
                             <img src="<?= e($eventImage) ?>" alt="" loading="lazy">
                         </div>
                     <?php endif; ?>
-                    <div class="event-body">
+                    <div class="event-body" data-lag="0.25">
                         <p class="event-year"><?= e((string) ($event['year'] ?? 'Year unknown')) ?></p>
                         <p class="event-text"><?= e($event['text'] ?? '') ?></p>
                         <?php if (!empty($event['location']) || !empty($event['time'])): ?>
@@ -247,7 +274,6 @@ $videoId = $song !== null
                 </p>
 
                 <?php if ($videoId !== null): ?>
-                    <button type="button" id="music-play" class="music-button">Turn on sound</button>
                     <div class="video">
                         <div id="music-player"></div>
                     </div>
@@ -282,12 +308,15 @@ $videoId = $song !== null
 
         <p class="admin-link"><a href="index.php">Start over</a></p>
     </main>
+    </div>
+    </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollSmoother.min.js"></script>
     <script src="assets/images.js"></script>
     <script src="assets/day.js"></script>
+    <script src="assets/gate.js"></script>
     <script src="assets/cinema.js"></script>
     <script src="assets/music.js"></script>
 </body>

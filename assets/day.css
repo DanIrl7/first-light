@@ -11,16 +11,6 @@ body.page-day {
     background: transparent;
 }
 
-/* Smooth scrolling (Lenis). These are the library's recommended rules. */
-html.lenis,
-html.lenis body {
-    height: auto;
-}
-
-.lenis.lenis-smooth {
-    scroll-behavior: auto !important;
-}
-
 /* The sky: four layers that cross-fade as the page scrolls, matching the clock. Without JavaScript or with
    reduced motion, only the dawn layer shows, as a still warm backdrop. */
 .sky {

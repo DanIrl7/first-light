@@ -34,6 +34,7 @@ if ($placeText === '' && old_value($old, 'place_latitude') !== '') {
     <link rel="stylesheet" href="assets/style.css">
     <link rel="stylesheet" href="assets/calendar.css">
     <link rel="stylesheet" href="assets/places.css">
+    <script src="assets/dev-motion.js"></script>
     <script>document.documentElement.classList.add('js');</script>
 </head>
 <body class="page-start">
@@ -101,7 +102,7 @@ if ($placeText === '' && old_value($old, 'place_latitude') !== '') {
     <script src="assets/calendar.js"></script>
     <script src="assets/places.js"></script>
     <script src="assets/form.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
     <script src="assets/start.js"></script>
 </body>
 </html>
