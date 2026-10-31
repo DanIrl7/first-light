@@ -1,18 +1,28 @@
-/* Shared base and the start page. Projector-light palette: warm black, film-gold, cream.
-   The day page adds its own rules in day.css. */
+/* Shared base and the start page. Deep indigo background, mint accent, cool white text.
+   The day page adds its own rules in day.css. Hover effects sit behind (hover: hover) and
+   (pointer: fine), so a tap on a phone never leaves one stuck on. */
 
 :root {
     color-scheme: dark;
 
-    --bg: #0a0b1e;
-    --surface: #11122c;
-    --card: #171937;
-    --text: #ecefff;
-    --muted: #9aa0c8;
-    --accent: #6ee7c8;
-    --accent-deep: #2fb89a;
-    --on-accent: #04201a;
-    --border: rgba(236, 239, 255, 0.16);
+    /* Warm dark: a plum-brown night, cream text, an amber accent. Each colour that needs a see-through
+       version also has an -rgb twin, so rgba(var(--accent-rgb), 0.2) follows the palette. */
+    --bg: #150d12;
+    --bg-rgb: 21, 13, 18;
+    --surface: #1f141b;
+    --card: #2a1a22;
+    --card-rgb: 42, 26, 34;
+    --text: #fff1e3;
+    --text-rgb: 255, 241, 227;
+    --muted: #c9ad9d;
+    --muted-rgb: 201, 173, 157;
+    --accent: #ffb454;
+    --accent-rgb: 255, 180, 84;
+    --accent-hover: #ffcb85;
+    --accent-deep: #e8902a;
+    --on-accent: #2b1405;
+    --danger: #ff7a70;
+    --border: rgba(var(--text-rgb), 0.16);
 
     --font-display: "Fraunces", Georgia, "Times New Roman", serif;
     --font-body: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -61,6 +71,13 @@ body::before {
 a {
     color: var(--accent);
     text-underline-offset: 0.2em;
+    transition: color 0.15s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    a:hover {
+        color: var(--accent-hover);
+    }
 }
 
 :focus-visible {
@@ -106,7 +123,7 @@ h3 {
     height: 90vmax;
     margin-left: -45vmax;
     pointer-events: none;
-    background: radial-gradient(closest-side, rgba(110, 231, 200, 0.22), rgba(140, 110, 255, 0.12) 55%, transparent 75%);
+    background: radial-gradient(closest-side, rgba(var(--accent-rgb), 0.22), rgba(255, 110, 120, 0.12) 55%, transparent 75%);
     filter: blur(20px);
 }
 
@@ -153,7 +170,7 @@ h3 {
     padding: clamp(20px, 4vw, 32px);
     border: 1px solid var(--border);
     border-radius: 16px;
-    background: rgba(23, 25, 55, 0.72);
+    background: rgba(var(--card-rgb), 0.72);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
 }
@@ -163,7 +180,7 @@ label {
     gap: 6px;
     color: var(--muted);
     font-family: var(--font-mono);
-    font-size: 0.74rem;
+    font-size: 0.78rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
 }
@@ -173,7 +190,7 @@ input {
     padding: 12px 14px;
     border: 1px solid var(--border);
     border-radius: 10px;
-    background: rgba(10, 11, 30, 0.7);
+    background: rgba(var(--bg-rgb), 0.7);
     color: var(--text);
     font: inherit;
     font-size: 1rem;
@@ -182,18 +199,20 @@ input {
     transition: border-color 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
 }
 
-input:hover {
-    border-color: rgba(236, 239, 255, 0.3);
+@media (hover: hover) and (pointer: fine) {
+    input:hover {
+        border-color: rgba(var(--text-rgb), 0.3);
+    }
 }
 
 input:focus {
     border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(110, 231, 200, 0.2);
+    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.2);
     outline: none;
 }
 
 input::placeholder {
-    color: rgba(154, 160, 200, 0.7);
+    color: rgba(var(--muted-rgb), 0.7);
 }
 
 button {
@@ -206,16 +225,21 @@ button {
     font: inherit;
     font-weight: 600;
     cursor: pointer;
-    transition: transform 0.2s var(--ease-out), background-color 0.2s var(--ease-out);
+    transition: transform 0.2s var(--ease-out), background-color 0.2s var(--ease-out),
+        border-color 0.2s var(--ease-out), color 0.2s var(--ease-out);
 }
 
-button:hover {
-    background: #9af2dc;
-    transform: translateY(-2px);
+@media (hover: hover) and (pointer: fine) {
+    button:hover {
+        background: var(--accent-hover);
+        transform: translateY(-2px);
+    }
 }
 
+/* Quick on the way down, so a press registers at once. */
 button:active {
     transform: scale(0.97);
+    transition-duration: 0.1s;
 }
 
 .form-actions {
@@ -232,9 +256,11 @@ button:active {
     color: var(--text);
 }
 
-.button-secondary:hover {
-    border-color: var(--accent);
-    background: rgba(110, 231, 200, 0.1);
+@media (hover: hover) and (pointer: fine) {
+    .button-secondary:hover {
+        border-color: var(--accent);
+        background: rgba(var(--accent-rgb), 0.1);
+    }
 }
 
 .button-secondary[hidden] {
@@ -279,7 +305,7 @@ button.is-loading::before {
 /* A message under the field it belongs to. The field itself gets a warm red border. */
 .field-error {
     margin: -0.5rem 0 0;
-    color: #ff9b85;
+    color: var(--danger);
     font-size: 0.9rem;
 }
 
@@ -289,7 +315,7 @@ button.is-loading::before {
 
 input[aria-invalid="true"],
 .date-picker-toggle[aria-invalid="true"] {
-    border-color: #ff9b85;
+    border-color: var(--danger);
 }
 
 .flash {

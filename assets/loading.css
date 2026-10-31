@@ -165,7 +165,7 @@
 
 .loading-failed p {
     margin: 0;
-    color: #ff9b85;
+    color: var(--danger);
 }
 
 /* Spoken updates for screen readers only. */

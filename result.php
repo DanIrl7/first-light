@@ -73,7 +73,22 @@ function clock_hours(?string $time): ?float
     return $time === null ? null : (int) substr($time, 0, 2) + (int) substr($time, 3, 2) / 60;
 }
 
+// The look of the sky for a weather description from weather.php. Unknown or missing weather is a clear sky.
+function weather_mood(?string $condition): string
+{
+    return match ($condition) {
+        'Partly cloudy' => 'cloudy',
+        'Fog' => 'fog',
+        'Drizzle' => 'drizzle',
+        'Rain', 'Rain showers' => 'rain',
+        'Snow', 'Snow showers' => 'snow',
+        'Thunderstorm' => 'storm',
+        default => 'clear',
+    };
+}
+
 $weather = $day['weather'];
+$mood = weather_mood($weather['condition'] ?? null);
 $sunrise = clock_hours($weather['sunrise'] ?? null);
 $sunset = clock_hours($weather['sunset'] ?? null);
 $numbers = $day['numbers'];
@@ -118,12 +133,21 @@ $tenThousandthAway = $numbers['ten_thousandth']['days_away'];
         </button>
     <?php endif; ?>
 
-    <div class="sky" aria-hidden="true"<?= $sunrise !== null && $sunset !== null && $sunrise < $sunset ? ' data-sunrise="' . e((string) round($sunrise, 3)) . '" data-sunset="' . e((string) round($sunset, 3)) . '"' : '' ?>>
+    <div class="sky" aria-hidden="true" data-weather="<?= e($mood) ?>"<?= $sunrise !== null && $sunset !== null && $sunrise < $sunset ? ' data-sunrise="' . e((string) round($sunrise, 3)) . '" data-sunset="' . e((string) round($sunset, 3)) . '"' : '' ?>>
         <span class="sky-night"></span>
         <span class="sky-dawn"></span>
         <span class="sky-noon"></span>
         <span class="sky-dusk"></span>
         <i class="sky-orb"></i>
+        <div class="sky-weather">
+            <i class="wx-veil"></i>
+            <i class="wx-clouds"></i>
+            <i class="wx-haze"></i>
+            <i class="wx-precip-far"></i>
+            <i class="wx-precip"></i>
+            <i class="wx-snow"></i>
+            <i class="wx-flash"></i>
+        </div>
     </div>
 
     <div class="clock" aria-hidden="true">
@@ -175,9 +199,12 @@ $tenThousandthAway = $numbers['ten_thousandth']['days_away'];
                         $temperature = (float) $day['weather']['temperature_c'];
                         $decimals = $temperature === round($temperature) ? 0 : 1;
                         ?>
-                        <span class="temp" data-speed="1.12" data-count="<?= e((string) $temperature) ?>" data-decimals="<?= $decimals ?>"><?= e(number_format($temperature, $decimals, '.', '')) ?></span>
+                        <div class="temp-row" data-speed="1.12">
+                            <span class="temp" data-count="<?= e((string) $temperature) ?>" data-decimals="<?= $decimals ?>"><?= e(number_format($temperature, $decimals, '.', '')) ?></span>
+                            <span class="temp-unit">°C</span>
+                        </div>
                         <p class="weather-detail">
-                            °C · <?= e($day['weather']['condition']) ?>
+                            <?= e($day['weather']['condition']) ?>
                             <span class="meta">at <?= e($day['weather']['time']) ?></span>
                         </p>
                         <?php

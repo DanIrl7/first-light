@@ -20,6 +20,7 @@ Live at https://born-here.onrender.com (the address comes from the Render servic
 - **Growing up on the charts:** the Billboard number one on your 13th, 16th, 18th and 21st birthdays. Birthdays that haven't happened yet, or fall before 1958, are skipped.
 - **Leaders:** the head of state and head of government of the birth country on that day.
 - **Clock and sky:** a clock pinned to the corner maps your scroll position onto the day, from 00:00 at the top to 23:59 at the bottom. The sky behind the page follows it: night, dawn, noon, dusk, and night again, with a sun that crosses the screen.
+- **Weather in the sky:** the weather at noon on the birth date sets the mood of the sky for the whole scroll: clear, cloudy, fog, drizzle, rain, snow or thunderstorm. Each has its own dimming, drifting clouds and, where it fits, falling rain or snow, a faded sun, or lightning. It is all CSS, driven by a `data-weather` attribute on the sky.
 - **Events:** the 12 most notable events for the date, shown oldest first, with photos when Wikipedia has them. Times appear only when a source gives one.
 - **People:** the 5 most notable people born on the date, with birthplace and what they're known for, in a pinned strip that scrolls sideways.
 - **Certificate:** a card with the name, place, and date.
@@ -45,7 +46,7 @@ Results are cached in the database, so a repeat birthday loads instantly.
 
 ## Design
 
-- **Palette:** deep indigo background, mint accent, cool white text. The sky layers shift through rose-violet, blue, and plum. The colours are CSS variables at the top of `assets/style.css`.
+- **Palette:** a warm dark plum-brown background, cream text and an amber accent. The sky layers shift through violet night, coral dawn, golden noon and crimson dusk. The colours are CSS variables at the top of `assets/style.css`, each with an `-rgb` twin for see-through versions.
 - **Fonts:** Fraunces for headings, Manrope for body text, and DM Mono for small labels, loaded from Google Fonts.
 - **Animation:** [GSAP](https://gsap.com) 3.13 (ScrollTrigger and ScrollSmoother), loaded from jsDelivr.
 

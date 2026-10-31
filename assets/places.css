@@ -22,10 +22,17 @@
     cursor: pointer;
 }
 
-.place-option[aria-selected="true"],
-.place-option:hover {
+.place-option[aria-selected="true"] {
     background: var(--bg);
     color: var(--accent);
+}
+
+/* The list is used constantly, so the highlight follows the pointer with no fade. */
+@media (hover: hover) and (pointer: fine) {
+    .place-option:hover {
+        background: var(--bg);
+        color: var(--accent);
+    }
 }
 
 .place-message {

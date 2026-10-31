@@ -16,7 +16,7 @@ html.js.has-gate .gate {
     display: grid;
     place-items: center;
     padding: var(--gutter);
-    background: radial-gradient(60% 50% at 50% 42%, rgba(110, 231, 200, 0.16), transparent 70%), var(--bg);
+    background: radial-gradient(60% 50% at 50% 42%, rgba(var(--accent-rgb), 0.16), transparent 70%), var(--bg);
     text-align: center;
 }
 
@@ -80,10 +80,16 @@ html.js.has-gate .gate {
     text-underline-offset: 0.25em;
 }
 
-.gate-skip:hover {
-    background: none;
-    color: var(--text);
-    transform: none;
+@media (hover: hover) and (pointer: fine) {
+    .gate-skip:hover {
+        background: none;
+        color: var(--text);
+        transform: none;
+    }
+}
+
+.gate-skip:active {
+    transform: scale(0.97);
 }
 
 .gate-skip[hidden] {
@@ -99,9 +105,11 @@ html.js.has-gate .gate {
     text-decoration: none;
 }
 
-.gate-skip.is-primary:hover {
-    background: #9af2dc;
-    color: var(--on-accent);
+@media (hover: hover) and (pointer: fine) {
+    .gate-skip.is-primary:hover {
+        background: var(--accent-hover);
+        color: var(--on-accent);
+    }
 }
 
 html.gate-opening .gate {
@@ -125,7 +133,7 @@ html.gate-opening .gate {
     max-width: min(70vw, 18rem);
     padding: 9px 16px 9px 12px;
     border: 1px solid var(--border);
-    background: rgba(10, 11, 30, 0.6);
+    background: rgba(var(--bg-rgb), 0.6);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     color: var(--text);
@@ -133,9 +141,16 @@ html.gate-opening .gate {
     font-weight: 500;
 }
 
-.sound-toggle:hover {
-    background: rgba(10, 11, 30, 0.8);
-    transform: none;
+@media (hover: hover) and (pointer: fine) {
+    .sound-toggle:hover {
+        border-color: rgba(var(--text-rgb), 0.32);
+        background: rgba(var(--bg-rgb), 0.8);
+        transform: none;
+    }
+}
+
+.sound-toggle:active {
+    transform: scale(0.97);
 }
 
 .sound-toggle[hidden],
@@ -199,7 +214,7 @@ html.has-gate .sound-toggle {
     position: absolute;
     inset: 0;
     z-index: 1;
-    background: linear-gradient(100deg, #0c0d24 30%, #1a1c3d 50%, #0c0d24 70%) 0 0 / 220% 100%;
+    background: linear-gradient(100deg, #170e13 30%, #2c1b24 50%, #170e13 70%) 0 0 / 220% 100%;
     transition: opacity 0.8s var(--ease-out);
     pointer-events: none;
 }
