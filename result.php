@@ -265,6 +265,21 @@ $tenThousandthAway = $numbers['ten_thousandth']['days_away'];
                         <?php endif; ?>
                     </span>
                 </div>
+                <?php $prices = $day['prices']; ?>
+                <?php if ($prices['stamp_cents'] !== null): ?>
+                    <div class="stat stat-wide" data-reveal>
+                        <span class="stat-label">A first-class stamp, in the US</span>
+                        <span class="stat-value"><?= e((string) $prices['stamp_cents']) ?>¢</span>
+                        <span class="stat-note"><?= $prices['stamp_cents'] === $prices['stamp_cents_now'] ? 'Still the going rate today.' : 'Today it costs ' . e((string) $prices['stamp_cents_now']) . '¢.' ?></span>
+                    </div>
+                <?php endif; ?>
+                <?php if ($prices['wage'] !== null): ?>
+                    <div class="stat stat-wide" data-reveal>
+                        <span class="stat-label">US federal minimum wage</span>
+                        <span class="stat-value">$<?= e(number_format($prices['wage'], 2)) ?> an hour</span>
+                        <span class="stat-note"><?= $prices['wage'] === $prices['wage_now'] ? 'Still the going rate today.' : 'Today it\'s $' . e(number_format($prices['wage_now'], 2)) . '.' ?></span>
+                    </div>
+                <?php endif; ?>
             </div>
         </section>
 
@@ -410,6 +425,44 @@ $tenThousandthAway = $numbers['ten_thousandth']['days_away'];
             <?php else: ?>
                 <p class="meta">The Billboard Hot 100 only starts in 1958, so there's no chart song waiting for you on this date.</p>
             <?php endif; ?>
+        </section>
+
+        <section class="scene scene-culture">
+            <p class="eyebrow">Around town</p>
+            <h2 data-split>Cinemas and record shops</h2>
+            <p class="note" data-reveal>The film at the top of the US box office and the album at the top of the Billboard 200 around your date.</p>
+
+            <div class="culture-grid">
+                <?php $movie = $day['culture']['movie']; ?>
+                <article class="culture-card" data-reveal>
+                    <p class="eyebrow">At the movies</p>
+                    <?php if ($movie !== null): ?>
+                        <p class="culture-title"><?= e($movie['film']) ?></p>
+                        <p class="meta">
+                            No. 1 at the US box office, weekend ending <?= e((new DateTimeImmutable($movie['weekend_end']))->format('j F Y')) ?>
+                            <?= $movie['gross'] !== null ? ' · ' . e($movie['gross']) : '' ?>
+                        </p>
+                        <p><a href="https://www.youtube.com/results?search_query=<?= e(rawurlencode($movie['film'] . ' trailer')) ?>" rel="noopener">Find the trailer on YouTube</a></p>
+                    <?php else: ?>
+                        <p class="meta">The cinema listings for this date didn't make the trip.</p>
+                    <?php endif; ?>
+                </article>
+
+                <?php $album = $day['culture']['album']; ?>
+                <article class="culture-card" data-reveal>
+                    <p class="eyebrow">In the record shop</p>
+                    <?php if ($album !== null): ?>
+                        <p class="culture-title"><?= e($album['album']) ?></p>
+                        <p class="meta">
+                            by <?= e($album['artist']) ?>
+                            · No. 1 on the <?= e($album['chart']) ?>, week of <?= e((new DateTimeImmutable($album['chart_date']))->format('j F Y')) ?>
+                        </p>
+                        <p><a href="https://www.youtube.com/results?search_query=<?= e(rawurlencode($album['album'] . ' ' . $album['artist'])) ?>" rel="noopener">Find it on YouTube</a></p>
+                    <?php else: ?>
+                        <p class="meta">The record shop's chart for this date didn't make the trip.</p>
+                    <?php endif; ?>
+                </article>
+            </div>
         </section>
 
         <section class="scene scene-milestones">

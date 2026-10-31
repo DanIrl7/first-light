@@ -122,7 +122,9 @@ function billboard_year_rows(int $year): array
 
 // Read the weekly table from the rendered page. Song and artist cells use rowspan,
 // so values carry down into the rows they span.
-function billboard_parse_rows(string $html, int $year): array
+// $dateColumn is where the issue date sits: the song (or album) and the artist are the next two columns.
+// The Hot 100 tables start with a "No." column (1); the album tables start with the date (0).
+function billboard_parse_rows(string $html, int $year, int $dateColumn = 1): array
 {
     $dom = new DOMDocument();
     libxml_use_internal_errors(true);
@@ -181,12 +183,19 @@ function billboard_parse_rows(string $html, int $year): array
             $col++;
         }
 
-        // Columns: 0 = No., 1 = issue date, 2 = song, 3 = artist.
-        if (!isset($cells[1], $cells[2], $cells[3])) {
+        // A row that holds only the date (older album tables) is covered entirely by rowspans from above.
+        while (isset($carry[$col]) && $carry[$col]['left'] > 0) {
+            $cells[$col] = $carry[$col]['text'];
+            $carry[$col]['left']--;
+            $col++;
+        }
+
+        // Columns from the date on: issue date, song, artist.
+        if (!isset($cells[$dateColumn], $cells[$dateColumn + 1], $cells[$dateColumn + 2])) {
             continue;
         }
 
-        $date = DateTimeImmutable::createFromFormat('F j Y', trim($cells[1]) . ' ' . $year);
+        $date = DateTimeImmutable::createFromFormat('F j Y', trim($cells[$dateColumn]) . ' ' . $year);
 
         if ($date === false) {
             continue;
@@ -194,8 +203,8 @@ function billboard_parse_rows(string $html, int $year): array
 
         $rows[] = [
             'date' => $date->format('Y-m-d'),
-            'song' => trim($cells[2], " \t\"“”"),
-            'artist' => $cells[3],
+            'song' => trim($cells[$dateColumn + 1], " \t\"“”"),
+            'artist' => $cells[$dateColumn + 2],
         ];
     }
 

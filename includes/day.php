@@ -8,6 +8,8 @@ require_once __DIR__ . '/weather.php';
 require_once __DIR__ . '/billboard.php';
 require_once __DIR__ . '/leaders.php';
 require_once __DIR__ . '/numbers.php';
+require_once __DIR__ . '/culture.php';
+require_once __DIR__ . '/prices.php';
 
 // Everything the day page shows, built from a profile: ['name', 'birthday', 'place' => [...]].
 // Each part is independent, so one failed source leaves the rest of the page intact.
@@ -48,6 +50,7 @@ function build_day(array $profile, ?callable $progress = null): array
         'weather' => $step('weather', fn () => weather_at_noon($place['latitude'], $place['longitude'], $date->format('Y-m-d'), $place['timezone'])),
         'song' => $step('song', fn () => billboard_number_one_on($date)),
         'milestones' => $step('milestones', fn () => billboard_milestones($date)),
+        'culture' => $step('culture', fn () => culture_on($date)),
         'people' => $step('people', fn () => wiki_top_people($month, $day)),
         'events' => $step('events', fn () => wiki_year_events((int) $date->format('Y'), $month, $day)),
         'also' => $step('also', fn () => [
@@ -56,5 +59,6 @@ function build_day(array $profile, ?callable $progress = null): array
         ]),
         // Plain arithmetic, so no step. Worked out each time because days alive changes daily.
         'numbers' => day_numbers($date),
+        'prices' => birth_prices($date),
     ];
 }

@@ -20,6 +20,7 @@ $steps = [
     'weather' => 'Checking the sky, from sunrise to sunset',
     'song' => 'Tuning the radio to the number one song',
     'milestones' => 'Fast-forwarding through your growing-up years',
+    'culture' => 'Peeking into cinemas and record shops',
     'people' => 'Rounding up your birthday twins',
     'events' => 'Skimming the day\'s headlines',
     'also' => 'Seeing who else dropped by that day',

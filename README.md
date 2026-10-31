@@ -8,12 +8,14 @@ Live at https://born-here.onrender.com (the address comes from the Render servic
 
 - **Input:** name, birthday (from 1 January 1940), and birth place. The place is picked from a suggestion list, so cities with the same name are told apart. There's a visible calendar for the birthday, and a fallback city and country field if the list isn't available. If a submit fails, every field keeps what was typed and each error shows under its field.
 - **Surprise me!:** a button on the form fills in a random date (from 1958, so there's always a chart song) and a random well-known city. The visitor only adds a name. There is another at the bottom of the day page, which keeps the name and starts a new random day.
-- **Loading screen:** the first time a day is built, a screen shows each step (city, leaders, weather, song, growing-up songs, people, events, also on this day, video) as it finishes, with a retry if something fails.
+- **Loading screen:** the first time a day is built, a screen shows each step (city, leaders, weather, song, growing-up songs, cinemas and record shops, people, events, also on this day, video) as it finishes, with a retry if something fails.
 - **Open the hatch:** the day page opens behind a cover while the music video loads. The button unlocks once the video is playing. If that takes more than 30 seconds, or the video can't load, "Step out without sound" appears. The click is what lets the browser play sound.
 - **Music:** the Billboard Hot 100 number one in effect that week. It plays all the way down the page, a little quieter away from its own section, and a button in the corner turns it on and off. The video loops and requests 720p.
 - **City and weather:** a Wikipedia summary and image for the city, plus the weather at 12:00 local time on the birth date.
 - **Weather details:** besides the noon reading, the day's high and low, rain, top wind speed, and sunrise and sunset times. The sky behind the page turns at the real sunrise and sunset of the birth place, and the sun crosses the sky between them.
 - **Your day in numbers:** the weekday, star sign, Chinese zodiac animal (by the Lunar New Year, not 1 January), the moon's phase that night, days alive, and the date of your 10,000th day.
+- **Prices:** in the numbers section, the US first-class stamp and the US federal minimum wage on your birthday, next to today's. These come from fixed tables (USPS and the Department of Labor), so they are US-only and cover 1940 onward.
+- **Cinemas and record shops:** the number one film at the US box office that weekend, and the number one album on the Billboard 200 that week. Each shows a short message if Wikipedia has no list for that date.
 - **Also on this day:** well-known people who died on the date, and holidays and observances, from Wikipedia's "On this day" feed.
 - **Growing up on the charts:** the Billboard number one on your 13th, 16th, 18th and 21st birthdays. Birthdays that haven't happened yet, or fall before 1958, are skipped.
 - **Leaders:** the head of state and head of government of the birth country on that day.
@@ -33,6 +35,8 @@ Live at https://born-here.onrender.com (the address comes from the Render servic
 | Country leaders | Wikidata |
 | Place search | Open-Meteo geocoding (no key needed) |
 | Weather, sunrise and sunset | Open-Meteo historical archive (no key needed) |
+| Number one film and album | Wikipedia's yearly lists of US box office number-one films and Billboard 200 number-one albums |
+| Stamp price, minimum wage | Fixed tables in `includes/prices.php`, from the USPS and the US Department of Labor |
 | Star sign, zodiac, moon phase, day counts | Calculated in `includes/numbers.php` (Lunar New Year dates are a built-in table for 1940–2030) |
 | Chart song | Billboard Hot 100 number ones, read from Wikipedia's year pages (1958 onward) |
 | Music video | `data/videos.csv`, then the YouTube Data API if a key is set |
@@ -126,7 +130,7 @@ Each new search costs 100 units of YouTube's 10,000-unit daily quota, so `--limi
 - `loading.php`: the loading screen
 - `build.php`: gathers the day and reports progress to the loading screen
 - `result.php`: the day page
-- `includes/`: data sources (`wiki.php`, `billboard.php`, `weather.php`, `geocode.php`, `leaders.php`, `numbers.php`, `youtube.php`, `music.php`), caching (`app.php`), and the page builder (`day.php`)
+- `includes/`: data sources (`wiki.php`, `billboard.php`, `weather.php`, `geocode.php`, `leaders.php`, `numbers.php`, `culture.php`, `prices.php`, `youtube.php`, `music.php`), caching (`app.php`), and the page builder (`day.php`)
 - `assets/`: styles and scripts. `cinema.js` holds the scroll animations, `gate.js` the click-to-begin cover, `music.js` the player, `day.js` the clock, `random.js` the randomize button, and `dev-motion.js` the localhost-only motion override
 - `data/videos.csv`: video IDs for chart songs
 - `schema.sql`: the database schema

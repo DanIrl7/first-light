@@ -564,10 +564,27 @@ img.is-broken {
 
 /* Your day in numbers */
 
+/* Four small cards, then pairs of wide ones: 1 column on phones, 2 on tablets, 4 on desktops. */
 .stats {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    grid-template-columns: 1fr;
     gap: clamp(14px, 2vw, 24px);
+}
+
+@media (min-width: 560px) {
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .stat-wide {
+        grid-column: span 2;
+    }
+}
+
+@media (min-width: 900px) {
+    .stats {
+        grid-template-columns: repeat(4, 1fr);
+    }
 }
 
 .stat {
@@ -604,12 +621,6 @@ img.is-broken {
 
 .stat-note {
     color: var(--muted);
-}
-
-@media (min-width: 900px) {
-    .stat-wide {
-        grid-column: span 2;
-    }
 }
 
 /* Also on this day */
@@ -660,6 +671,30 @@ img.is-broken {
 
 .also-holidays li {
     display: block;
+}
+
+/* Cinemas and record shops */
+
+.culture-grid {
+    display: grid;
+    gap: clamp(32px, 6vw, 96px);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+}
+
+.culture-card {
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+}
+
+.culture-card p {
+    margin: 0 0 0.6rem;
+}
+
+.culture-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-style: italic;
+    line-height: 1.1;
 }
 
 /* Growing up on the charts */
