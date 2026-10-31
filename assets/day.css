@@ -1,6 +1,6 @@
 /* Day page: a sequence of full-width scenes. Tokens come from style.css.
    Nothing here hides content. Hidden starting states are set by cinema.js, so the page stays
-   readable if the animation library fails to load or the visitor prefers reduced motion. */
+   readable if the animation library fails to load. */
 
 .day {
     overflow-x: clip;
@@ -11,8 +11,8 @@ body.page-day {
     background: transparent;
 }
 
-/* The sky: four layers that cross-fade as the page scrolls, matching the clock. Without JavaScript or with
-   reduced motion, only the dawn layer shows, as a still warm backdrop. */
+/* The sky: four layers that cross-fade as the page scrolls, matching the clock. Without JavaScript or
+   if the animation library fails to load, only the dawn layer shows, as a still warm backdrop. */
 .sky {
     position: fixed;
     inset: 0;
@@ -187,10 +187,8 @@ body.page-day {
     transform-origin: top;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .scroll-cue::after {
-        animation: cue 2.2s var(--ease-out) infinite;
-    }
+.scroll-cue::after {
+    animation: cue 2.2s var(--ease-out) infinite;
 }
 
 @keyframes cue {
@@ -306,17 +304,15 @@ body.page-day {
     background: linear-gradient(100deg, var(--surface) 30%, #20234a 50%, var(--surface) 70%) 0 0 / 220% 100%;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .event-media.is-loading,
-    .person-photo.is-loading,
-    .leader img.is-loading {
-        animation: shimmer 1.6s linear infinite;
-    }
+.event-media.is-loading,
+.person-photo.is-loading,
+.leader img.is-loading {
+    animation: shimmer 1.6s linear infinite;
+}
 
-    .event-media img,
-    .hero-img {
-        transition: opacity 0.7s var(--ease-out);
-    }
+.event-media img,
+.hero-img {
+    transition: opacity 0.7s var(--ease-out);
 }
 
 @keyframes shimmer {

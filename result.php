@@ -92,7 +92,6 @@ $tenThousandthAway = $numbers['ten_thousandth']['days_away'];
     <link rel="stylesheet" href="assets/style.css">
     <link rel="stylesheet" href="assets/day.css">
     <link rel="stylesheet" href="assets/music.css">
-    <script src="assets/dev-motion.js"></script>
     <script>document.documentElement.classList.add('js');</script>
 </head>
 <body class="page-day">

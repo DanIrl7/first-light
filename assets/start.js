@@ -1,11 +1,11 @@
 // Opening sequence for the start page: the title, intro and form rise in one after another.
-// Skipped for visitors who prefer reduced motion, and harmless if GSAP didn't load.
+// Harmless if GSAP didn't load.
 (function () {
     if (!window.gsap) {
         return;
     }
 
-    gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
+    gsap.matchMedia().add('all', () => {
         gsap.from('[data-intro]', {
             y: 40,
             opacity: 0,

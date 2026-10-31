@@ -104,10 +104,8 @@ html.js.has-gate .gate {
     color: var(--on-accent);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    html.gate-opening .gate {
-        transition: opacity 0.9s var(--ease-out);
-    }
+html.gate-opening .gate {
+    transition: opacity 0.9s var(--ease-out);
 }
 
 html.gate-opening .gate {
@@ -210,10 +208,8 @@ html.has-gate .sound-toggle {
     opacity: 0;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .video:not(.is-ready)::before {
-        animation: shimmer 1.6s linear infinite;
-    }
+.video:not(.is-ready)::before {
+    animation: shimmer 1.6s linear infinite;
 }
 
 /* A clear layer over the player, so clicks can't open the video on YouTube. */

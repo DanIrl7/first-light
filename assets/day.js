@@ -8,7 +8,6 @@
         return;
     }
 
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     let target = 0;
     let shown = 0;
     let running = false;
@@ -41,12 +40,6 @@
         const scrollable = document.documentElement.scrollHeight - window.innerHeight;
         const progress = scrollable > 0 ? window.scrollY / scrollable : 0;
         target = Math.min(1439, Math.max(0, progress * 1439));
-
-        if (reducedMotion.matches) {
-            shown = target;
-            draw(shown);
-            return;
-        }
 
         if (!running) {
             running = true;

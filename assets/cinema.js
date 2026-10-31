@@ -1,6 +1,7 @@
 // Scroll choreography for the day page, built on GSAP and ScrollTrigger.
-// Every animation lives inside gsap.matchMedia(), so visitors who prefer reduced motion get the
-// finished page with no movement. If GSAP fails to load, nothing is hidden and the page still reads.
+// Every animation lives inside gsap.matchMedia(), which also handles the screen-width cases.
+// The animations always run, whatever the system's motion setting says.
+// If GSAP fails to load, nothing is hidden and the page still reads.
 (function () {
     if (!window.gsap || !window.ScrollTrigger) {
         return;
@@ -67,7 +68,7 @@
 
     const motion = gsap.matchMedia();
 
-    motion.add('(prefers-reduced-motion: no-preference)', () => {
+    motion.add('all', () => {
         const hero = document.querySelector('.scene-hero');
 
         // Smooth, eased scrolling with GSAP's ScrollSmoother. It must exist before any ScrollTrigger, so it comes
@@ -346,7 +347,6 @@
             }
         }
 
-        // Undone if the visitor switches to reduced motion while the page is open.
         return () => {
             if (smoother) {
                 smoother.kill();
@@ -356,7 +356,7 @@
 
     // On wide screens the people scene is pinned and the strip of portraits slides sideways as you scroll.
     // On narrow screens it stays a swipeable strip.
-    motion.add('(prefers-reduced-motion: no-preference) and (min-width: 900px)', () => {
+    motion.add('(min-width: 900px)', () => {
         const scene = document.querySelector('.scene-people');
         const track = scene ? scene.querySelector('.people-track') : null;
 

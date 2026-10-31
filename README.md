@@ -23,7 +23,7 @@ Live at https://born-here.onrender.com (the address comes from the Render servic
 - **Events:** the 12 most notable events for the date, shown oldest first, with photos when Wikipedia has them. Times appear only when a source gives one.
 - **People:** the 5 most notable people born on the date, with birthplace and what they're known for, in a pinned strip that scrolls sideways.
 - **Certificate:** a card with the name, place, and date.
-- **Motion:** scrolling is smoothed with GSAP ScrollSmoother, and sections animate in with ScrollTrigger. Visitors who ask their system for reduced motion get the finished page with no movement and no smoothing.
+- **Motion:** scrolling is smoothed with GSAP ScrollSmoother, and sections animate in with ScrollTrigger. The animations always run, even when the visitor's system asks for reduced motion.
 
 ## Data sources
 
@@ -65,10 +65,6 @@ Requirements: PHP 8.4 with the `pdo_mysql` and `curl` extensions, and a MySQL or
 3. Open http://localhost:8000.
 
 With no environment variables set, the app connects to `127.0.0.1` as `root` with an empty password, which is fine for local use only.
-
-### Testing animations with reduced motion on
-
-If your system has animations turned off (for example Windows "Animation effects"), the browser reports "reduce motion" and the site skips its animations and smooth scrolling on purpose. To see them anyway while developing, open the site on localhost with `?motion=on`, for example http://localhost:8000/?motion=on. It lasts for that browser tab, and `?motion=off` turns it off. This does nothing on any other host, so the live site always respects the setting.
 
 ## Configuration
 
@@ -131,7 +127,7 @@ Each new search costs 100 units of YouTube's 10,000-unit daily quota, so `--limi
 - `build.php`: gathers the day and reports progress to the loading screen
 - `result.php`: the day page
 - `includes/`: data sources (`wiki.php`, `billboard.php`, `weather.php`, `geocode.php`, `leaders.php`, `numbers.php`, `culture.php`, `prices.php`, `youtube.php`, `music.php`), caching (`app.php`), and the page builder (`day.php`)
-- `assets/`: styles and scripts. `cinema.js` holds the scroll animations, `gate.js` the click-to-begin cover, `music.js` the player, `day.js` the clock, `random.js` the randomize button, and `dev-motion.js` the localhost-only motion override
+- `assets/`: styles and scripts. `cinema.js` holds the scroll animations, `gate.js` the click-to-begin cover, `music.js` the player, `day.js` the clock and `random.js` the randomize button
 - `data/videos.csv`: video IDs for chart songs
 - `schema.sql`: the database schema
 - `Dockerfile`: the container used for hosting

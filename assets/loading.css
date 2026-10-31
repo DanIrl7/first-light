@@ -35,10 +35,8 @@
     color: var(--accent);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .dots::after {
-        animation: dots 1.4s steps(4, end) infinite;
-    }
+.dots::after {
+    animation: dots 1.4s steps(4, end) infinite;
 }
 
 @keyframes dots {
@@ -121,10 +119,8 @@
     border-top-color: transparent;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .steps li[data-state="active"] .mark {
-        animation: spin 0.9s linear infinite;
-    }
+.steps li[data-state="active"] .mark {
+    animation: spin 0.9s linear infinite;
 }
 
 @keyframes spin {
@@ -180,12 +176,4 @@
     overflow: hidden;
     clip-path: inset(50%);
     white-space: nowrap;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .meter span,
-    .page-loading main,
-    .steps li {
-        transition: none;
-    }
 }

@@ -38,7 +38,6 @@ $steps = [
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&amp;family=Fraunces:ital,wght@0,400;0,700;0,800;1,400;1,600&amp;family=Manrope:wght@300;400;500;600&amp;display=swap">
     <link rel="stylesheet" href="assets/style.css">
     <link rel="stylesheet" href="assets/loading.css">
-    <script src="assets/dev-motion.js"></script>
     <script>document.documentElement.classList.add('js');</script>
     <noscript><meta http-equiv="refresh" content="0;url=/result"></noscript>
 </head>

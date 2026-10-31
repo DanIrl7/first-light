@@ -34,7 +34,6 @@ if ($placeText === '' && old_value($old, 'place_latitude') !== '') {
     <link rel="stylesheet" href="assets/style.css">
     <link rel="stylesheet" href="assets/calendar.css">
     <link rel="stylesheet" href="assets/places.css">
-    <script src="assets/dev-motion.js"></script>
     <script>document.documentElement.classList.add('js');</script>
 </head>
 <body class="page-start">
