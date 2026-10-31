@@ -3,6 +3,7 @@ require __DIR__ . '/includes/bootstrap.php';
 require __DIR__ . '/includes/day.php';
 require __DIR__ . '/includes/music.php';
 require __DIR__ . '/includes/youtube.php';
+require __DIR__ . '/includes/share.php';
 
 // The first build for a birthday calls several slow APIs, so it can run longer than PHP's default 30 seconds.
 set_time_limit(120);
@@ -116,9 +117,8 @@ $tenThousandthAway = $numbers['ten_thousandth']['days_away'];
             <div class="gate-inner">
                 <p class="eyebrow">Landing sequence complete</p>
                 <h2 class="gate-title" id="gate-title"><?= e($day['name']) ?>, you've landed.</h2>
-                <p class="gate-song">Your arrival song: "<?= e($song['song']) ?>" by <?= e($song['artist']) ?></p>
-                <button type="button" class="gate-button is-loading" id="gate-start" disabled>Warming up the soundtrack…</button>
-                <p class="gate-note" id="gate-note" role="status">Tuning the radio.</p>
+                <button type="button" class="gate-button is-loading" id="gate-start" disabled>Powering up the machine…</button>
+                <p class="gate-note" id="gate-note" role="status">Calibrating the chronometer…</p>
                 <button type="button" class="gate-skip" id="gate-skip" hidden>Step out without sound</button>
             </div>
         </div>
@@ -526,6 +526,19 @@ $tenThousandthAway = $numbers['ten_thousandth']['days_away'];
                     <strong><?= e($place['name']) ?></strong>, <?= e($place['country']) ?>,
                     on <strong><?= e($birthday->format('j F Y')) ?></strong>.
                 </p>
+
+                <!-- share.js fills in the full address and copies it. Without JavaScript, nothing here shows. -->
+                <div class="share" id="share" data-path="/share?t=<?= e(share_token($_SESSION['profile'])) ?>" hidden>
+                    <button type="button" class="button-secondary" id="share-open" aria-expanded="false" aria-controls="share-panel">Share with someone</button>
+                    <div class="share-panel" id="share-panel" hidden>
+                        <p class="share-hint" id="share-hint">Anyone with this link lands on the same day, with your name on it.</p>
+                        <div class="share-row">
+                            <input type="text" id="share-link" readonly aria-labelledby="share-hint" spellcheck="false">
+                            <button type="button" id="share-copy">Copy link</button>
+                        </div>
+                        <p class="share-status" id="share-status" role="status" aria-live="polite"></p>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -559,5 +572,6 @@ $tenThousandthAway = $numbers['ten_thousandth']['days_away'];
     <script src="assets/cinema.js"></script>
     <script src="assets/music.js"></script>
     <script src="assets/random.js"></script>
+    <script src="assets/share.js"></script>
 </body>
 </html>

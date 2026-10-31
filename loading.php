@@ -24,7 +24,7 @@ $steps = [
     'people' => 'Rounding up your birthday twins',
     'events' => 'Skimming the day\'s headlines',
     'also' => 'Seeing who else dropped by that day',
-    'video' => 'Cueing the soundtrack',
+    'video' => 'Syncing the machine\'s clocks',
 ];
 ?>
 <!doctype html>

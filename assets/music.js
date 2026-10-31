@@ -52,9 +52,7 @@
             toggle.setAttribute('aria-label', on ? 'Turn the music off' : 'Turn the music on');
         }
 
-        setStatus(on
-            ? 'Your soundtrack follows you down the page, and gets a little quieter away from this video.'
-            : 'The radio is off. Use the button in the corner to turn it on.');
+        setStatus(on ? '' : 'The radio is off. Use the button in the corner to turn it on.');
     }
 
     function loadApi() {

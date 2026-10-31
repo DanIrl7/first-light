@@ -44,11 +44,6 @@ html.js.has-gate .gate {
     line-height: 1.05;
 }
 
-.gate-song {
-    color: var(--muted);
-    font-style: italic;
-}
-
 .gate-button {
     justify-self: center;
     margin-top: 0.75rem;
@@ -240,4 +235,9 @@ html.has-gate .sound-toggle {
     .sound-toggle {
         display: none !important;
     }
+}
+
+/* With the sound on there is nothing to say, so the empty line takes no room under the video. */
+#music-status:empty {
+    display: none;
 }

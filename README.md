@@ -9,7 +9,7 @@ Live at https://born-here.onrender.com (the address comes from the Render servic
 - **Input:** name, birthday (from 1 January 1940), and birth place. The place is picked from a suggestion list, so cities with the same name are told apart. There's a visible calendar for the birthday, and a fallback city and country field if the list isn't available. If a submit fails, every field keeps what was typed and each error shows under its field.
 - **Surprise me!:** a button on the form fills in a random date (from 1958, so there's always a chart song) and a random well-known city. The visitor only adds a name. There is another at the bottom of the day page, which keeps the name and starts a new random day.
 - **Loading screen:** the first time a day is built, a screen shows each step (city, leaders, weather, song, growing-up songs, cinemas and record shops, people, events, also on this day, video) as it finishes, with a retry if something fails.
-- **Open the hatch:** the day page opens behind a cover while the music video loads. The button unlocks once the video is playing. If that takes more than 30 seconds, or the video can't load, "Step out without sound" appears. The click is what lets the browser play sound.
+- **Open the hatch:** the day page opens behind a cover while the music video loads in the background. While it waits, the cover only talks about the time machine ("Calibrating the chronometer…", "Aligning the dials…") and never names the music. The button unlocks once the video is playing. "Step out without sound" is the only mention of sound, and it appears 30 seconds in, or at once if the video can't load. The click is what lets the browser play sound.
 - **Music:** the Billboard Hot 100 number one in effect that week. It plays all the way down the page, a little quieter away from its own section, and a button in the corner turns it on and off. The video loops and requests 720p.
 - **City and weather:** a Wikipedia summary and image for the city, plus the weather at 12:00 local time on the birth date.
 - **Weather details:** besides the noon reading, the day's high and low, rain, top wind speed, and sunrise and sunset times. The sky behind the page turns at the real sunrise and sunset of the birth place, and the sun crosses the sky between them.
@@ -24,6 +24,7 @@ Live at https://born-here.onrender.com (the address comes from the Render servic
 - **Events:** the 12 most notable events for the date, shown oldest first, with photos when Wikipedia has them. Times appear only when a source gives one.
 - **People:** the 5 most notable people born on the date, with birthplace and what they're known for, in a pinned strip that scrolls sideways.
 - **Certificate:** a card with the name, place, and date.
+- **Share with someone:** a button on the certificate that shows a link and copies it. Whoever opens the link lands on the same day, going through the loading screen first if it hasn't been built yet. The link holds the name, birthday and place themselves (packed small, nothing stored), so anyone who has the link can read them. Opening a link checks everything again as if it came from the form, and a broken or tampered link just goes back to the form.
 - **Motion:** scrolling is smoothed with GSAP ScrollSmoother, and sections animate in with ScrollTrigger. The animations always run, even when the visitor's system asks for reduced motion.
 
 ## Data sources
@@ -127,8 +128,9 @@ Each new search costs 100 units of YouTube's 10,000-unit daily quota, so `--limi
 - `loading.php`: the loading screen
 - `build.php`: gathers the day and reports progress to the loading screen
 - `result.php`: the day page
-- `includes/`: data sources (`wiki.php`, `billboard.php`, `weather.php`, `geocode.php`, `leaders.php`, `numbers.php`, `culture.php`, `prices.php`, `youtube.php`, `music.php`), caching (`app.php`), and the page builder (`day.php`)
-- `assets/`: styles and scripts. `cinema.js` holds the scroll animations, `gate.js` the click-to-begin cover, `music.js` the player, `day.js` the clock and `random.js` the randomize button
+- `share.php`: opens a share link, then sends the visitor to the loading screen
+- `includes/`: data sources (`wiki.php`, `billboard.php`, `weather.php`, `geocode.php`, `leaders.php`, `numbers.php`, `culture.php`, `prices.php`, `youtube.php`, `music.php`), caching (`app.php`), share links (`share.php`), and the page builder (`day.php`)
+- `assets/`: styles and scripts. `cinema.js` holds the scroll animations, `gate.js` the click-to-begin cover, `music.js` the player, `day.js` the clock, `random.js` the randomize button and `share.js` the share-link button
 - `data/videos.csv`: video IDs for chart songs
 - `schema.sql`: the database schema
 - `Dockerfile`: the container used for hosting

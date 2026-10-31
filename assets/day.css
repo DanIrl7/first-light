@@ -939,6 +939,58 @@ img.is-broken {
     font-weight: 600;
 }
 
+/* Share with someone, inside the certificate. The panel opens under the button. */
+.share {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 14px;
+    margin-top: clamp(24px, 4vw, 36px);
+}
+
+.share[hidden],
+.share-panel[hidden] {
+    display: none;
+}
+
+.share > button {
+    justify-self: center;
+}
+
+.share-panel {
+    display: grid;
+    gap: 10px;
+    width: min(100%, 30rem);
+}
+
+.share-hint,
+.share-status {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.share-status {
+    min-height: 1.4em;
+}
+
+.share-row {
+    display: flex;
+    gap: 10px;
+}
+
+.share-row input {
+    flex: 1;
+    min-width: 0;
+    font-size: 0.9rem;
+    text-overflow: ellipsis;
+}
+
+.share-row button {
+    flex: none;
+    padding-inline: 20px;
+}
+
 /* Randomize the day, below the certificate. */
 .again {
     display: grid;

@@ -9,8 +9,19 @@
         return;
     }
 
-    const SLOW_AFTER = 30000; // after this long without a playing video, offer to go on without sound
+    const SKIP_AFTER = 30000; // the "step out without sound" link only appears after this long
     const FADE = 900; // matches the fade-out in music.css
+    const LINE_EVERY = 4500; // how often the waiting message changes
+
+    // What the cover says while it waits. It stays in the time machine's world and never names the music.
+    const WAITING_LINES = [
+        'Calibrating the chronometer…',
+        'Aligning the dials…',
+        'Steadying the temporal field…',
+        'Checking the landing gear…',
+        'Warming up the engines…',
+        'Plotting the final approach…',
+    ];
     const content = document.getElementById('smooth-wrapper');
     const start = document.getElementById('gate-start');
     const skip = document.getElementById('gate-skip');
@@ -18,7 +29,17 @@
 
     let opened = false;
     let settled = false; // the video is ready, or loading failed
-    let slowTimer = null;
+    let skipTimer = null;
+    let lineTimer = null;
+    let line = 0;
+
+    // Screen readers shouldn't read out every changing line, only the one that says what to do next.
+    note.setAttribute('aria-live', 'off');
+
+    function stopWaitingLines() {
+        clearInterval(lineTimer);
+        note.setAttribute('aria-live', 'polite');
+    }
 
     // Keeps keyboard and screen reader users inside the cover until it's gone.
     if (content) {
@@ -31,7 +52,8 @@
         }
 
         opened = true;
-        clearTimeout(slowTimer);
+        clearTimeout(skipTimer);
+        clearInterval(lineTimer);
         clearTimeout(missingTimer);
         root.classList.add('gate-opening');
 
@@ -73,37 +95,49 @@
             }
 
             settled = true;
-            clearTimeout(slowTimer);
+            stopWaitingLines();
             start.disabled = false;
             start.classList.remove('is-loading');
             start.textContent = 'Open the hatch';
-            note.textContent = 'Sound on for the full effect.';
-            skip.hidden = false;
+            note.textContent = 'All systems are go. Open the hatch when you\'re ready.';
             start.focus({ preventScroll: true });
         },
 
-        // The video can't be played at all, so there is nothing to wait for.
-        fail(message) {
+        // The video can't be played at all, so there is nothing to wait for. The only way forward is to step out,
+        // so that link shows at once, whatever the clock says.
+        fail() {
             if (opened) {
                 return;
             }
 
             settled = true;
-            clearTimeout(slowTimer);
+            clearTimeout(skipTimer);
+            stopWaitingLines();
             start.hidden = true;
-            note.textContent = message;
+            note.textContent = 'The machine landed safely. Step out whenever you\'re ready.';
             skip.hidden = false;
             skip.classList.add('is-primary');
             skip.focus({ preventScroll: true });
         },
     };
 
-    slowTimer = setTimeout(() => {
-        if (!settled && !opened) {
+    // The waiting message changes every few seconds, so a long wait still feels like something is happening.
+    lineTimer = setInterval(() => {
+        line = (line + 1) % WAITING_LINES.length;
+        note.textContent = WAITING_LINES[line];
+    }, LINE_EVERY);
+
+    // The way out appears 30 seconds in, whether or not the video is ready, and not before.
+    skipTimer = setTimeout(() => {
+        if (!opened && !settled) {
+            stopWaitingLines();
             note.textContent = 'The machine\'s running slow today.';
+        }
+
+        if (!opened) {
             skip.hidden = false;
         }
-    }, SLOW_AFTER);
+    }, SKIP_AFTER);
 
     const missingTimer = setTimeout(() => {
         if (!window.bornGate.attached) {

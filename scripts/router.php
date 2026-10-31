@@ -8,7 +8,7 @@ if (PHP_SAPI !== 'cli-server') {
 
 $root = dirname(__DIR__);
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
-$pages = 'start|loading|result|build';
+$pages = 'start|loading|result|build|share';
 
 // /result.php is sent to /result (GET only, so a POST keeps its data).
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && preg_match("#^/(index|$pages)\.php$#", $path, $match)) {
