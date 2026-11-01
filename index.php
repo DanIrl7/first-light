@@ -40,7 +40,7 @@ if ($placeText === '' && old_value($old, 'place_latitude') !== '') {
     <div class="glow" aria-hidden="true"></div>
 
     <main>
-        <p class="eyebrow" data-intro>Strap in. We're going back to day one.</p>
+        <p class="eyebrow" data-intro><?= emoji('🚀') ?> Strap in. We're going back to day one.</p>
         <h1 data-intro>First <em>Light</em></h1>
         <p class="intro" data-intro>Tell the time machine who you are, when you arrived and where. It will take you back to see what the world looked like that day.</p>
 
@@ -51,14 +51,14 @@ if ($placeText === '' && old_value($old, 'place_latitude') !== '') {
         <form method="post" action="/start" class="card" id="born-form" novalidate>
             <?= csrf_field() ?>
 
-            <label>Who's travelling?
+            <label><?= emoji('🧑‍🚀') ?> Who's travelling?
                 <input type="text" name="name" id="field-name" maxlength="80" required autocomplete="given-name"
                     value="<?= e(old_value($old, 'name')) ?>"
                     <?= isset($errors['name']) ? 'aria-invalid="true"' : '' ?> aria-describedby="error-name">
             </label>
             <p class="field-error" id="error-name" role="alert" <?= isset($errors['name']) ? '' : 'hidden' ?>><?= e($errors['name'] ?? '') ?></p>
 
-            <label>Date of arrival
+            <label><?= emoji('📅') ?> Date of arrival
                 <input type="date" name="birthday" id="birthday-native" class="native-date" min="1940-01-01" max="<?= e($today) ?>" required
                     value="<?= e(old_value($old, 'birthday')) ?>"
                     <?= isset($errors['birthday']) ? 'aria-invalid="true"' : '' ?> aria-describedby="error-birthday">
@@ -66,7 +66,7 @@ if ($placeText === '' && old_value($old, 'place_latitude') !== '') {
             <p class="field-error" id="error-birthday" role="alert" <?= isset($errors['birthday']) ? '' : 'hidden' ?>><?= e($errors['birthday'] ?? '') ?></p>
             <small class="hint">The machine can reach back to 1 January 1940. Not a day earlier.</small>
 
-            <label>Point of arrival
+            <label><?= emoji('📍') ?> Point of arrival
                 <input type="text" name="place_search" id="place-search" autocomplete="off" placeholder="Where did you land? Start typing a city" aria-autocomplete="list" aria-controls="place-results" aria-expanded="false"
                     value="<?= e($placeText) ?>"
                     <?= isset($errors['place']) ? 'aria-invalid="true"' : '' ?> aria-describedby="error-place">
@@ -95,8 +95,8 @@ if ($placeText === '' && old_value($old, 'place_latitude') !== '') {
             <input type="hidden" name="place_timezone" id="place_timezone" value="<?= e(old_value($old, 'place_timezone')) ?>">
 
             <div class="form-actions">
-                <button type="submit">Take me back</button>
-                <button type="button" class="button-secondary" id="random-day" hidden>Surprise me!</button>
+                <button type="submit"><?= emoji('⏪') ?> Take me back</button>
+                <button type="button" class="button-secondary" id="random-day" hidden><?= emoji('🎲') ?> Surprise me!</button>
             </div>
             <small class="hint" id="random-note" role="status" hidden></small>
         </form>

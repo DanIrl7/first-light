@@ -9,6 +9,12 @@ function e(string $value): string
     return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
+// An emoji that is only decoration, hidden from screen readers (they would read out its name).
+function emoji(string $symbol): string
+{
+    return '<span class="emoji" aria-hidden="true">' . $symbol . '</span>';
+}
+
 // Hidden field carrying the per-session CSRF token.
 function csrf_field(): string
 {

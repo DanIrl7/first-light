@@ -90,11 +90,18 @@ function weather_mood(?string $condition): string
 
 $weather = $day['weather'];
 $mood = weather_mood($weather['condition'] ?? null);
+$moodEmoji = ['clear' => '☀️', 'cloudy' => '⛅', 'fog' => '🌫️', 'drizzle' => '🌦️', 'rain' => '🌧️', 'snow' => '❄️', 'storm' => '⛈️'][$mood];
 $sunrise = clock_hours($weather['sunrise'] ?? null);
 $sunset = clock_hours($weather['sunset'] ?? null);
 $numbers = $day['numbers'];
-$tenThousandth = new DateTimeImmutable($numbers['ten_thousandth']['date']);
-$tenThousandthAway = $numbers['ten_thousandth']['days_away'];
+$prices = $day['prices'];
+$nowYear = (int) (new DateTimeImmutable('today'))->format('Y');
+
+// A price in dollars, with cents unless it is a whole large number (a house, not an egg).
+function money(float|int $amount, int $decimals = 2): string
+{
+    return '$' . number_format($amount, $decimals);
+}
 ?>
 <!doctype html>
 <html lang="en"<?= $videoId !== null ? ' class="has-gate"' : '' ?>>
@@ -115,7 +122,7 @@ $tenThousandthAway = $numbers['ten_thousandth']['days_away'];
         <!-- Covers the page while the music video loads. gate.js removes it after the click. -->
         <div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title">
             <div class="gate-inner">
-                <p class="eyebrow">Landing sequence complete</p>
+                <p class="eyebrow"><?= emoji('🛬') ?> Landing sequence complete</p>
                 <h2 class="gate-title" id="gate-title"><?= e($day['name']) ?>, you've landed.</h2>
                 <button type="button" class="gate-button is-loading" id="gate-start" disabled>Powering up the machine…</button>
                 <p class="gate-note" id="gate-note" role="status">Calibrating the chronometer…</p>
@@ -168,7 +175,7 @@ $tenThousandthAway = $numbers['ten_thousandth']['days_away'];
             <?php endif; ?>
 
             <div class="hero-copy">
-                <p class="eyebrow">Where it began</p>
+                <p class="eyebrow"><?= emoji('🌅') ?> Where it began</p>
                 <h1 data-split><?= e($day['name']) ?>, you arrived in <em><?= e($place['name']) ?></em>.</h1>
                 <p class="meta">
                     <?= e($birthday->format('j F Y')) ?> · <?= e($region . $place['country']) ?>
@@ -181,7 +188,7 @@ $tenThousandthAway = $numbers['ten_thousandth']['days_away'];
         <section class="scene scene-place">
             <div class="place-grid">
                 <div>
-                    <p class="eyebrow" data-reveal>The destination</p>
+                    <p class="eyebrow" data-reveal><?= emoji('📍') ?> The destination</p>
                     <?php if (!empty($day['city']['extract'])): ?>
                         <p class="lede" data-scrub><?= e($day['city']['extract']) ?></p>
                         <?php if ($cityUrl !== null): ?>
@@ -193,7 +200,7 @@ $tenThousandthAway = $numbers['ten_thousandth']['days_away'];
                 </div>
 
                 <div class="weather" data-reveal>
-                    <p class="eyebrow">The weather</p>
+                    <p class="eyebrow"><?= emoji($moodEmoji) ?> The weather</p>
                     <?php if ($day['weather'] !== null): ?>
                         <?php
                         $temperature = (float) $day['weather']['temperature_c'];
@@ -204,7 +211,7 @@ $tenThousandthAway = $numbers['ten_thousandth']['days_away'];
                             <span class="temp-unit">°C</span>
                         </div>
                         <p class="weather-detail">
-                            <?= e($day['weather']['condition']) ?>
+                            <?= emoji($moodEmoji) ?> <?= e($day['weather']['condition']) ?>
                             <span class="meta">at <?= e($day['weather']['time']) ?></span>
                         </p>
                         <?php
@@ -218,10 +225,11 @@ $tenThousandthAway = $numbers['ten_thousandth']['days_away'];
                             'Sunset' => $w['sunset'] ?? null,
                         ], fn ($value) => $value !== null);
                         ?>
+                        <?php $factIcons = ['High' => '🔆', 'Low' => '🌙', 'Rain' => '🌧️', 'Wind' => '💨', 'Sunrise' => '🌅', 'Sunset' => '🌇']; ?>
                         <?php if ($facts !== []): ?>
                             <dl class="weather-facts">
                                 <?php foreach ($facts as $label => $value): ?>
-                                    <div><dt><?= e($label) ?></dt><dd><?= e($value) ?></dd></div>
+                                    <div><dt><?= emoji($factIcons[$label]) ?> <?= e($label) ?></dt><dd><?= e($value) ?></dd></div>
                                 <?php endforeach; ?>
                             </dl>
                         <?php endif; ?>
@@ -233,7 +241,7 @@ $tenThousandthAway = $numbers['ten_thousandth']['days_away'];
 
             <?php if ($day['leaders']['head_of_state'] !== null || $day['leaders']['head_of_government'] !== null): ?>
                 <div class="leaders" data-reveal>
-                    <p class="eyebrow">In charge of <?= e($place['country']) ?> that day</p>
+                    <p class="eyebrow"><?= emoji('🏛️') ?> In charge of <?= e($place['country']) ?> that day</p>
                     <div class="leaders-row">
                         <?php foreach (['Head of state' => 'head_of_state', 'Head of government' => 'head_of_government'] as $title => $key): ?>
                             <?php $leader = $day['leaders'][$key]; ?>
@@ -252,66 +260,135 @@ $tenThousandthAway = $numbers['ten_thousandth']['days_away'];
         </section>
 
         <section class="scene scene-numbers">
-            <p class="eyebrow">The readout</p>
+            <p class="eyebrow"><?= emoji('📟') ?> The readout</p>
             <h2 data-split>Your day in numbers</h2>
             <p class="note" data-reveal>What the machine's dials say about <?= e($birthday->format('j F Y')) ?>.</p>
 
             <div class="stats">
                 <div class="stat" data-reveal>
-                    <span class="stat-label">You landed on a</span>
+                    <span class="stat-label"><?= emoji('📅') ?> You landed on a</span>
                     <span class="stat-value"><?= e($numbers['weekday']) ?></span>
                 </div>
                 <div class="stat" data-reveal>
-                    <span class="stat-label">Star sign</span>
+                    <span class="stat-label"><?= emoji(NUMBER_EMOJI['star'][$numbers['star_sign']] ?? '✨') ?> Star sign</span>
                     <span class="stat-value"><?= e($numbers['star_sign']) ?></span>
                 </div>
                 <div class="stat" data-reveal>
-                    <span class="stat-label">Chinese zodiac</span>
+                    <span class="stat-label"><?= emoji(NUMBER_EMOJI['animal'][$numbers['chinese_zodiac']] ?? '🐉') ?> Chinese zodiac</span>
                     <span class="stat-value">Year of the <?= e($numbers['chinese_zodiac']) ?></span>
                 </div>
                 <div class="stat" data-reveal>
-                    <span class="stat-label">The moon that night</span>
+                    <span class="stat-label"><?= emoji(NUMBER_EMOJI['moon'][$numbers['moon']['name']] ?? '🌙') ?> The moon that night</span>
                     <span class="stat-value"><?= e($numbers['moon']['name']) ?></span>
                     <span class="stat-note"><?= e((string) $numbers['moon']['lit']) ?>% lit</span>
                 </div>
                 <div class="stat stat-wide" data-reveal>
-                    <span class="stat-label">Days since you arrived</span>
+                    <span class="stat-label"><?= emoji('⏳') ?> Days since you arrived</span>
                     <span class="stat-value stat-big" data-count="<?= e((string) $numbers['days_alive']) ?>" data-group="1"><?= e(number_format($numbers['days_alive'])) ?></span>
                 </div>
-                <div class="stat stat-wide" data-reveal>
-                    <span class="stat-label">Your 10,000th day</span>
-                    <span class="stat-value"><?= e($tenThousandth->format('j F Y')) ?></span>
-                    <span class="stat-note">
-                        <?php if ($tenThousandthAway > 0): ?>
-                            That's <?= e(number_format($tenThousandthAway)) ?> days from now. Mark the calendar.
-                        <?php elseif ($tenThousandthAway === 0): ?>
-                            That's today. Happy 10,000th!
-                        <?php else: ?>
-                            You passed it <?= e(number_format(abs($tenThousandthAway))) ?> days ago.
+                <?php $home = $prices['home']; ?>
+                <?php if ($home !== null): ?>
+                    <div class="stat stat-wide" data-reveal>
+                        <span class="stat-label"><?= emoji('🏡') ?> Median price of a home</span>
+                        <span class="stat-value"><?= e(money($home['value'], 0)) ?></span>
+                        <span class="stat-note">
+                            <?= $home['kind'] === 'new'
+                                ? 'What new houses sold for in the US that year, in the middle of the pack.'
+                                : 'The US Census median home value for ' . e((string) $home['census_year']) . ', the nearest count before your year.' ?>
+                            Today it's <?= e(money($home['now'], 0)) ?>.
+                        </span>
+                    </div>
+                <?php endif; ?>
+            </div>
+
+            <?php
+            // The total counts only the items with a price in both columns, so the two always add up the same things.
+            $receiptRows = $prices['receipt'];
+            $counted = array_filter($receiptRows, fn ($row) => $row['then'] !== null);
+            $thenTotal = array_sum(array_column($counted, 'then'));
+            $nowTotal = array_sum(array_column($counted, 'now'));
+            $olderNow = array_filter($counted, fn ($row) => $row['now_year'] !== $nowYear);
+            $notOnRecord = count($counted) < count($receiptRows);
+            ?>
+            <div class="receipt-wrap" data-reveal>
+                <div class="receipt" role="group" aria-labelledby="receipt-title">
+                    <p class="receipt-store"><?= emoji('🧾') ?> <span id="receipt-title">First Light General Store</span></p>
+                    <p class="receipt-sub">United States prices &middot; <?= e($birthday->format('j M Y')) ?></p>
+                    <hr>
+                    <table class="receipt-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Item</th>
+                                <th scope="col"><?= e($birthday->format('Y')) ?></th>
+                                <th scope="col">Today</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php $icons = ['eggs' => '🥚', 'milk' => '🥛', 'ticket' => '🎟️', 'gas' => '⛽']; ?>
+                            <?php foreach ($receiptRows as $row): ?>
+                                <tr>
+                                    <th scope="row"><?= emoji($icons[$row['key']]) ?> <?= e($row['label']) ?></th>
+                                    <?php if ($row['then'] !== null): ?>
+                                        <td><?= e(money($row['then'])) ?></td>
+                                        <td><?= e(money($row['now'])) ?><?= $row['now_year'] !== $nowYear ? '*' : '' ?></td>
+                                    <?php else: ?>
+                                        <td class="receipt-na">no record</td>
+                                        <td><?= e(money($row['now'])) ?><?= $row['now_year'] !== $nowYear ? '*' : '' ?></td>
+                                    <?php endif; ?>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                        <?php if ($counted !== []): ?>
+                            <tfoot>
+                                <tr>
+                                    <th scope="row"><?= $notOnRecord ? 'Total of what is on record' : 'Total' ?></th>
+                                    <td><?= e(money($thenTotal)) ?></td>
+                                    <td><?= e(money($nowTotal)) ?><?= $olderNow !== [] ? '*' : '' ?></td>
+                                </tr>
+                            </tfoot>
                         <?php endif; ?>
-                    </span>
+                    </table>
+                    <?php if ($prices['stamp_cents'] !== null || $prices['wage'] !== null): ?>
+                        <hr>
+                        <table class="receipt-table receipt-extras">
+                            <tbody>
+                                <?php if ($prices['stamp_cents'] !== null): ?>
+                                    <tr>
+                                        <th scope="row"><?= emoji('✉️') ?> First-class stamp</th>
+                                        <td><?= e((string) $prices['stamp_cents']) ?>&cent;</td>
+                                        <td><?= e((string) $prices['stamp_cents_now']) ?>&cent;</td>
+                                    </tr>
+                                <?php endif; ?>
+                                <?php if ($prices['wage'] !== null): ?>
+                                    <tr>
+                                        <th scope="row"><?= emoji('⏰') ?> Min. wage, an hour</th>
+                                        <td><?= e(money($prices['wage'])) ?></td>
+                                        <td><?= e(money($prices['wage_now'])) ?></td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    <?php endif; ?>
+                    <hr>
+                    <?php if ($notOnRecord): ?>
+                        <p class="receipt-note">No record: nobody tracked this price that year, at least not anywhere the machine can read.</p>
+                    <?php endif; ?>
+                    <?php
+                    // Today's figure can be older than this year when a table has stopped (the movie ticket table ends in 2017).
+                    $staleNow = array_filter($receiptRows, fn ($row) => $row['now_year'] !== $nowYear);
+                    ?>
+                    <?php if ($staleNow !== []): ?>
+                        <p class="receipt-note">* The newest figure on record: <?= e(implode(', ', array_map(fn ($row) => strtolower($row['label']) . ' ' . $row['now_year'], $staleNow))) ?>.</p>
+                    <?php endif; ?>
+                    <p class="receipt-thanks"><?= emoji('✨') ?> Thank you for travelling <?= emoji('✨') ?></p>
+                    <div class="receipt-barcode" aria-hidden="true"></div>
                 </div>
-                <?php $prices = $day['prices']; ?>
-                <?php if ($prices['stamp_cents'] !== null): ?>
-                    <div class="stat stat-wide" data-reveal>
-                        <span class="stat-label">A first-class stamp, in the US</span>
-                        <span class="stat-value"><?= e((string) $prices['stamp_cents']) ?>¢</span>
-                        <span class="stat-note"><?= $prices['stamp_cents'] === $prices['stamp_cents_now'] ? 'Still the going rate today.' : 'Today it costs ' . e((string) $prices['stamp_cents_now']) . '¢.' ?></span>
-                    </div>
-                <?php endif; ?>
-                <?php if ($prices['wage'] !== null): ?>
-                    <div class="stat stat-wide" data-reveal>
-                        <span class="stat-label">US federal minimum wage</span>
-                        <span class="stat-value">$<?= e(number_format($prices['wage'], 2)) ?> an hour</span>
-                        <span class="stat-note"><?= $prices['wage'] === $prices['wage_now'] ? 'Still the going rate today.' : 'Today it\'s $' . e(number_format($prices['wage_now'], 2)) . '.' ?></span>
-                    </div>
-                <?php endif; ?>
             </div>
         </section>
 
         <section class="scene scene-events">
             <div class="ghost" aria-hidden="true" data-speed="0.8"><span><?= e($birthday->format('Y')) ?> · <?= e($birthday->format('Y')) ?> · <?= e($birthday->format('Y')) ?> · <?= e($birthday->format('Y')) ?></span></div>
-            <p class="eyebrow">The world that day</p>
+            <p class="eyebrow"><?= emoji('🌍') ?> The world that day</p>
             <h2 data-split>What was going on</h2>
             <p class="note" data-reveal>Headlines Wikipedia lists for this date in <?= e($birthday->format('Y')) ?>, in the order its monthly article gives them.</p>
 
@@ -344,7 +421,7 @@ $tenThousandthAway = $numbers['ten_thousandth']['days_away'];
         </section>
 
         <section class="scene scene-people">
-            <p class="eyebrow">Your birthday twins</p>
+            <p class="eyebrow"><?= emoji('🎂') ?> Your birthday twins</p>
             <h2 data-split>Born on this day</h2>
             <p class="note" data-reveal>Five of the most widely covered people born on this date, ranked the same way. Shown for what they're known for, not judged.</p>
 
@@ -377,7 +454,7 @@ $tenThousandthAway = $numbers['ten_thousandth']['days_away'];
         </section>
 
         <section class="scene scene-also">
-            <p class="eyebrow">Same date, other years</p>
+            <p class="eyebrow"><?= emoji('🗓️') ?> Same date, other years</p>
             <h2 data-split>Also on this day</h2>
 
             <?php if ($day['also']['deaths'] === [] && $day['also']['holidays'] === []): ?>
@@ -387,7 +464,7 @@ $tenThousandthAway = $numbers['ten_thousandth']['days_away'];
             <div class="also-grid">
                 <?php if ($day['also']['deaths'] !== []): ?>
                     <div class="also-block" data-reveal>
-                        <p class="eyebrow">Gone on this day</p>
+                        <p class="eyebrow"><?= emoji('🕯️') ?> Gone on this day</p>
                         <ul class="also-list">
                             <?php foreach ($day['also']['deaths'] as $person): ?>
                                 <li>
@@ -410,7 +487,7 @@ $tenThousandthAway = $numbers['ten_thousandth']['days_away'];
 
                 <?php if ($day['also']['holidays'] !== []): ?>
                     <div class="also-block" data-reveal>
-                        <p class="eyebrow">On the calendar</p>
+                        <p class="eyebrow"><?= emoji('🎉') ?> On the calendar</p>
                         <ul class="also-list also-holidays">
                             <?php foreach ($day['also']['holidays'] as $holiday): ?>
                                 <li>
@@ -428,7 +505,7 @@ $tenThousandthAway = $numbers['ten_thousandth']['days_away'];
         </section>
 
         <section class="scene scene-music" id="music" data-video-id="<?= e($videoId ?? '') ?>">
-            <p class="eyebrow">The soundtrack</p>
+            <p class="eyebrow"><?= emoji('🎵') ?> The soundtrack</p>
             <h2 data-split>The top song that week</h2>
             <?php if ($song !== null): ?>
                 <p class="song-title" data-reveal>"<?= e($song['song']) ?>"</p>
@@ -454,14 +531,14 @@ $tenThousandthAway = $numbers['ten_thousandth']['days_away'];
         </section>
 
         <section class="scene scene-culture">
-            <p class="eyebrow">Around town</p>
+            <p class="eyebrow"><?= emoji('🏙️') ?> Around town</p>
             <h2 data-split>Cinemas and record shops</h2>
             <p class="note" data-reveal>The film at the top of the US box office and the album at the top of the Billboard 200 around your date.</p>
 
             <div class="culture-grid">
                 <?php $movie = $day['culture']['movie']; ?>
                 <article class="culture-card" data-reveal>
-                    <p class="eyebrow">At the movies</p>
+                    <p class="eyebrow"><?= emoji('🎬') ?> At the movies</p>
                     <?php if ($movie !== null): ?>
                         <p class="culture-title"><?= e($movie['film']) ?></p>
                         <p class="meta">
@@ -476,7 +553,7 @@ $tenThousandthAway = $numbers['ten_thousandth']['days_away'];
 
                 <?php $album = $day['culture']['album']; ?>
                 <article class="culture-card" data-reveal>
-                    <p class="eyebrow">In the record shop</p>
+                    <p class="eyebrow"><?= emoji('💿') ?> In the record shop</p>
                     <?php if ($album !== null): ?>
                         <p class="culture-title"><?= e($album['album']) ?></p>
                         <p class="meta">
@@ -492,7 +569,7 @@ $tenThousandthAway = $numbers['ten_thousandth']['days_away'];
         </section>
 
         <section class="scene scene-milestones">
-            <p class="eyebrow">Fast-forward</p>
+            <p class="eyebrow"><?= emoji('⏩') ?> Fast-forward</p>
             <h2 data-split>Growing up on the charts</h2>
 
             <?php if ($day['milestones'] === []): ?>
@@ -520,7 +597,7 @@ $tenThousandthAway = $numbers['ten_thousandth']['days_away'];
                     <circle cx="60" cy="60" r="45" pathLength="1"/>
                     <path d="M38 62 L54 78 L84 44" pathLength="1"/>
                 </svg>
-                <p class="eyebrow">Certificate of arrival</p>
+                <p class="eyebrow"><?= emoji('📜') ?> Certificate of arrival</p>
                 <p class="certificate-text" data-scrub>
                     This certifies that <strong><?= e($day['name']) ?></strong> arrived in
                     <strong><?= e($place['name']) ?></strong>, <?= e($place['country']) ?>,

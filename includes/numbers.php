@@ -1,13 +1,28 @@
 <?php
 declare(strict_types=1);
 
+// Emoji for the readout cards, by sign, animal and moon phase name.
+const NUMBER_EMOJI = [
+    'star' => [
+        'Aquarius' => '♒', 'Pisces' => '♓', 'Aries' => '♈', 'Taurus' => '♉', 'Gemini' => '♊', 'Cancer' => '♋',
+        'Leo' => '♌', 'Virgo' => '♍', 'Libra' => '♎', 'Scorpio' => '♏', 'Sagittarius' => '♐', 'Capricorn' => '♑',
+    ],
+    'animal' => [
+        'Rat' => '🐀', 'Ox' => '🐂', 'Tiger' => '🐅', 'Rabbit' => '🐇', 'Dragon' => '🐉', 'Snake' => '🐍',
+        'Horse' => '🐎', 'Goat' => '🐐', 'Monkey' => '🐒', 'Rooster' => '🐓', 'Dog' => '🐕', 'Pig' => '🐖',
+    ],
+    'moon' => [
+        'New moon' => '🌑', 'Waxing crescent' => '🌒', 'First quarter' => '🌓', 'Waxing gibbous' => '🌔',
+        'Full moon' => '🌕', 'Waning gibbous' => '🌖', 'Last quarter' => '🌗', 'Waning crescent' => '🌘',
+    ],
+];
+
 // Facts about a birthday that need no lookup: the weekday, star sign, Chinese zodiac animal, moon phase,
-// days alive and the date of the 10,000th day. Everything here is plain arithmetic, so nothing is cached.
+// and days alive. Everything here is plain arithmetic, so nothing is cached.
 function day_numbers(DateTimeImmutable $birthday, ?DateTimeImmutable $today = null): array
 {
     $today ??= new DateTimeImmutable('today');
     $alive = (int) $birthday->diff($today)->format('%r%a');
-    $tenThousandth = $birthday->modify('+10000 days');
 
     return [
         'weekday' => $birthday->format('l'),
@@ -15,11 +30,6 @@ function day_numbers(DateTimeImmutable $birthday, ?DateTimeImmutable $today = nu
         'chinese_zodiac' => chinese_zodiac($birthday),
         'moon' => moon_phase($birthday),
         'days_alive' => max(0, $alive),
-        'ten_thousandth' => [
-            'date' => $tenThousandth->format('Y-m-d'),
-            // Negative once it has passed, so the page can say "in 120 days" or "120 days ago".
-            'days_away' => (int) $today->diff($tenThousandth)->format('%r%a'),
-        ],
     ];
 }
 

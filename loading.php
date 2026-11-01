@@ -26,6 +26,12 @@ $steps = [
     'also' => 'Seeing who else dropped by that day',
     'video' => 'Syncing the machine\'s clocks',
 ];
+
+// A little picture for each step.
+$icons = [
+    'city' => '🗺️', 'leaders' => '🏛️', 'weather' => '🌤️', 'song' => '📻', 'milestones' => '⏩',
+    'culture' => '🍿', 'people' => '🎂', 'events' => '📰', 'also' => '🗓️', 'video' => '🕰️',
+];
 ?>
 <!doctype html>
 <html lang="en">
@@ -57,6 +63,7 @@ $steps = [
             <?php foreach ($steps as $key => $text): ?>
                 <li data-step="<?= e($key) ?>" data-state="waiting">
                     <span class="mark" aria-hidden="true"></span>
+                    <?= emoji($icons[$key]) ?>
                     <span class="label"><?= e($text) ?></span>
                 </li>
             <?php endforeach; ?>

@@ -325,3 +325,12 @@ input[aria-invalid="true"],
     border-radius: 8px;
     background: var(--card);
 }
+
+/* Decorative emoji. They sit in the text like a letter, with colour-emoji fonts first so they never fall back to mono glyphs. */
+.emoji {
+    font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+}

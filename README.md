@@ -13,14 +13,16 @@ Live at https://born-here.onrender.com (the address comes from the Render servic
 - **Music:** the Billboard Hot 100 number one in effect that week. It plays all the way down the page, a little quieter away from its own section, and a button in the corner turns it on and off. The video loops and requests 720p.
 - **City and weather:** a Wikipedia summary and image for the city, plus the weather at 12:00 local time on the birth date.
 - **Weather details:** besides the noon reading, the day's high and low, rain, top wind speed, and sunrise and sunset times. The sky behind the page turns at the real sunrise and sunset of the birth place, and the sun crosses the sky between them.
-- **Your day in numbers:** the weekday, star sign, Chinese zodiac animal (by the Lunar New Year, not 1 January), the moon's phase that night, days alive, and the date of your 10,000th day.
-- **Prices:** in the numbers section, the US first-class stamp and the US federal minimum wage on your birthday, next to today's. These come from fixed tables (USPS and the Department of Labor), so they are US-only and cover 1940 onward.
+- **Your day in numbers:** the weekday, star sign, Chinese zodiac animal (by the Lunar New Year, not 1 January), the moon's phase that night, days alive, and the median price of a home.
+- **Median home:** the median price of a home in the US in your birth year, next to today's. From 1963 it is the median sale price of new houses (Census Bureau and HUD, through FRED). Before that it is the Census median home value for the nearest census (1940, 1950 or 1960), and the card says so.
+- **Receipt:** a receipt of US prices in the numbers section, with the price of 12 eggs, a gallon of milk, a movie ticket and a gallon of gas in your birth year next to today's, and a total. The US first-class stamp and federal minimum wage sit below it. Where a table has nothing for that year the line reads "no record" and is left out of the total. These are fixed tables, so they are US-only and cover 1940 onward, but each item has its own start year (see the table below).
+- **Emoji:** the headings, readout cards, weather facts, receipt lines and loading steps carry a small emoji. They are decoration only and hidden from screen readers. The star sign, zodiac animal, moon phase and weather each get the matching one.
 - **Cinemas and record shops:** the number one film at the US box office that weekend, and the number one album on the Billboard 200 that week. Each shows a short message if Wikipedia has no list for that date.
 - **Also on this day:** well-known people who died on the date, and holidays and observances, from Wikipedia's "On this day" feed.
 - **Growing up on the charts:** the Billboard number one on your 13th, 16th, 18th and 21st birthdays. Birthdays that haven't happened yet, or fall before 1958, are skipped.
 - **Leaders:** the head of state and head of government of the birth country on that day.
 - **Clock and sky:** a clock pinned to the corner maps your scroll position onto the day, from 00:00 at the top to 23:59 at the bottom. The sky behind the page follows it: night, dawn, noon, dusk, and night again, with a sun that crosses the screen.
-- **Weather in the sky:** the weather at noon on the birth date sets the mood of the sky for the whole scroll: clear, cloudy, fog, drizzle, rain, snow or thunderstorm. Each has its own dimming, drifting clouds and, where it fits, falling rain or snow, a faded sun, or lightning. It is all CSS, driven by a `data-weather` attribute on the sky.
+- **Weather in the sky:** the weather at noon on the birth date sets the mood of the sky for the whole scroll: clear, cloudy, fog, drizzle, rain, snow or thunderstorm. Each has its own dimming, drifting clouds and, where it fits, falling rain or snow, a dimmed sun, or lightning. The layers are kept fairly solid, so the weather is easy to see. It is all CSS, driven by a `data-weather` attribute on the sky.
 - **Events:** the 12 most notable events for the date, shown oldest first, with photos when Wikipedia has them. Times appear only when a source gives one.
 - **People:** the 5 most notable people born on the date, with birthplace and what they're known for, in a pinned strip that scrolls sideways.
 - **Certificate:** a card with the name, place, and date.
@@ -39,6 +41,9 @@ Live at https://born-here.onrender.com (the address comes from the Render servic
 | Weather, sunrise and sunset | Open-Meteo historical archive (no key needed) |
 | Number one film and album | Wikipedia's yearly lists of US box office number-one films and Billboard 200 number-one albums |
 | Stamp price, minimum wage | Fixed tables in `includes/prices.php`, from the USPS and the US Department of Labor |
+| Eggs, milk, gas | Fixed yearly tables in `includes/prices.php` from the US Bureau of Labor Statistics (eggs and milk from 1980) and the Energy Information Administration (gas from 1949, then BLS from 1976) |
+| Movie ticket | A fixed table (1954 to 2017) of the National Association of Theatre Owners average price, as compiled by Cheapism and Box Office Mojo. Some years between 1954 and 1973 are estimates between the years NATO recorded |
+| Median home | Fixed tables: Census Bureau decennial median home value (1940, 1950, 1960) and the median sales price of new houses, via FRED (1963 onward) |
 | Star sign, zodiac, moon phase, day counts | Calculated in `includes/numbers.php` (Lunar New Year dates are a built-in table for 1940–2030) |
 | Chart song | Billboard Hot 100 number ones, read from Wikipedia's year pages (1958 onward) |
 | Music video | `data/videos.csv`, then the YouTube Data API if a key is set |
@@ -47,6 +52,7 @@ Results are cached in the database, so a repeat birthday loads instantly.
 
 ## Design
 
+- **Receipt:** the prices sit on a cream paper receipt with torn edges, a dashed rule and a barcode, set in DM Mono. It is plain CSS and a table, so it works without JavaScript.
 - **Palette:** a warm dark plum-brown background, cream text and an amber accent. The sky layers shift through violet night, coral dawn, golden noon and crimson dusk. The colours are CSS variables at the top of `assets/style.css`, each with an `-rgb` twin for see-through versions.
 - **Fonts:** Fraunces for headings, Manrope for body text, and DM Mono for small labels, loaded from Google Fonts.
 - **Animation:** [GSAP](https://gsap.com) 3.13 (ScrollTrigger and ScrollSmoother), loaded from jsDelivr.
@@ -112,6 +118,9 @@ Each new search costs 100 units of YouTube's 10,000-unit daily quota, so `--limi
 ## Limitations
 
 - A birthday that isn't cached yet takes about 30 seconds to build.
+- The price tables are fixed, so "today" is the newest figure they hold (September 2026 for eggs, milk and gas, and 2017 for the movie ticket, where the receipt marks it with an asterisk). They need refreshing by hand, with `NOW_PRICES` in `includes/prices.php`.
+- Eggs and milk have no reliable record before 1980, tickets before 1954 or after 2017, and gas before 1949, so those lines say "no record".
+- Before 1963 the home figure is a Census median of homes people owned, and from 1963 it is the price new houses sold for. They measure slightly different things, and today's figure is the new-house one.
 - Event locations are missing for most events, because Wikidata rarely records them.
 - The chart is the US Billboard Hot 100 only, and there's no chart data before 1958.
 - Historical photos from the birth year aren't implemented. The city image is a current Wikipedia photo.
